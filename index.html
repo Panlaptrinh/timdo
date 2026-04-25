@@ -44,13 +44,21 @@
             box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
         }
 
-        .map-item {
+        /* Lớp bọc ngoài để xử lý di chuyển bằng JavaScript */
+        .map-wrapper {
             position: absolute;
+            top: 0;
+            left: 0;
+            will-change: transform;
+        }
+
+        /* Lớp bên trong để xử lý rung lắc bằng CSS */
+        .map-item {
+            position: relative;
             display: flex;
             justify-content: center;
             align-items: center;
-            transform: translate(-50%, -50%);
-            transition: transform 0.2s;
+            transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--scl, 1));
         }
 
         .target-item {
@@ -58,11 +66,10 @@
             z-index: 10;
             font-size: 4rem;
             filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
-            animation: float 3s ease-in-out infinite;
         }
 
         .target-item:hover {
-            transform: translate(-50%, -50%) scale(1.1);
+            --scl: 1.2 !important;
             filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.8));
         }
 
@@ -72,6 +79,19 @@
             pointer-events: none;
             z-index: 1;
         }
+
+        /* Hiệu ứng Rung lắc (Jitter) & Nổi (Float) */
+        @keyframes jitter {
+            0%, 100% { margin-left: 0; margin-top: 0; }
+            25% { margin-left: var(--jx); margin-top: calc(var(--jy) * -1); }
+            50% { margin-left: calc(var(--jx) * -1); margin-top: var(--jy); }
+            75% { margin-left: calc(var(--jx) * -1); margin-top: calc(var(--jy) * -1); }
+        }
+
+        .shake-0 { animation: float 3s ease-in-out infinite; }
+        .shake-1 { --jx: 2px; --jy: 2px; animation: jitter 0.15s infinite; }
+        .shake-2 { --jx: 5px; --jy: 5px; animation: jitter 0.08s infinite; }
+        .shake-3 { --jx: 10px; --jy: 10px; animation: jitter 0.04s infinite; }
 
         @keyframes popOut {
             0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
@@ -181,7 +201,8 @@
                 <ul class="text-sm text-gray-600 space-y-2 font-semibold">
                     <li>🎵 <b>Có Nhạc Nền Mới:</b> Giai điệu ngũ cung thư giãn.</li>
                     <li>🌍 <b>Bản Đồ Khổng Lồ:</b> Rộng hơn gấp nhiều lần, hãy kéo/vuốt mỏi tay!</li>
-                    <li>⏱️ <b>Thời Gian Gấp Rút:</b> Bạn có rất ít thời gian để tìm hàng chục món đồ giữa hàng ngàn vật nhiễu.</li>
+                    <li>🌪️ <b>Mọi Thứ Đều Bay:</b> Đồ vật sẽ di chuyển và rung lắc mạnh mẽ khi cấp độ tăng lên. Hãy nhanh tay chộp lấy chúng!</li>
+                    <li>⏱️ <b>Thời Gian Gấp Rút:</b> Bạn có rất ít thời gian để tìm hàng chục món đồ.</li>
                 </ul>
             </div>
 
@@ -352,6 +373,24 @@
         let timeRemaining = 0;
         let timerInterval;
         let activeTargets = [];
+        let mapEntities = []; // Quản lý vật thể chuyển động
+        let rAF_ID = null;    // ID cho vòng lặp Animation
+
+        // Vòng lặp Animation (Di chuyển các đồ vật)
+        function animateMap() {
+            if (!isPlaying) return;
+            mapEntities.forEach(e => {
+                e.x += e.vx;
+                e.y += e.vy;
+                
+                // Đập vào tường thì dội lại
+                if (e.x <= 50 || e.x >= MAP_WIDTH - 50) e.vx *= -1;
+                if (e.y <= 50 || e.y >= MAP_HEIGHT - 50) e.vy *= -1;
+                
+                e.el.style.transform = `translate(${e.x}px, ${e.y}px)`;
+            });
+            rAF_ID = requestAnimationFrame(animateMap);
+        }
 
         // DOM Elements
         const mapContainer = document.getElementById('map-container');
@@ -370,23 +409,39 @@
             mapContainer.style.height = `${MAP_HEIGHT}px`;
             mapContainer.innerHTML = ''; 
             activeTargets = [];
+            mapEntities = []; // Reset danh sách vật thể
 
             // 1. Rải vật thể nhiễu
             for (let i = 0; i < levelConfig.decos; i++) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'map-wrapper';
+
                 const deco = document.createElement('div');
-                deco.className = 'map-item deco-item';
+                const shakeClass = currentLevelIndex > 0 ? `shake-${currentLevelIndex}` : 'shake-0';
+                deco.className = `map-item deco-item ${shakeClass}`;
                 deco.innerText = DECORATIONS[Math.floor(Math.random() * DECORATIONS.length)];
                 
                 const x = 50 + Math.random() * (MAP_WIDTH - 100);
                 const y = 50 + Math.random() * (MAP_HEIGHT - 100);
+                wrapper.style.transform = `translate(${x}px, ${y}px)`;
                 
-                deco.style.left = `${x}px`;
-                deco.style.top = `${y}px`;
-                // Scale nhỏ đi một chút ở map bự để dễ tạo ảo giác rộng lớn
                 const scale = currentLevelIndex >= 2 ? (0.5 + Math.random()*0.5) : (0.7 + Math.random()*0.6);
-                deco.style.transform = `translate(-50%, -50%) rotate(${(Math.random()-0.5)*30}deg) scale(${scale})`;
+                deco.style.setProperty('--rot', `${(Math.random()-0.5)*30}deg`);
+                deco.style.setProperty('--scl', scale);
                 
-                mapContainer.appendChild(deco);
+                wrapper.appendChild(deco);
+                mapContainer.appendChild(wrapper);
+
+                // Thêm vận tốc nếu màn > 0
+                const speed = currentLevelIndex > 0 ? (currentLevelIndex * 1.5 + Math.random() * 2) : 0;
+                if (speed > 0) {
+                    const angle = Math.random() * Math.PI * 2;
+                    mapEntities.push({
+                        el: wrapper, x: x, y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed
+                    });
+                }
             }
 
             // 2. Lấy ngẫu nhiên N vật phẩm cần tìm
@@ -395,22 +450,39 @@
 
             // 3. Rải Mục tiêu lên bản đồ
             selectedTargets.forEach(target => {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'map-wrapper';
+
                 const el = document.createElement('div');
-                el.className = 'map-item target-item';
-                el.id = `map-item-${target.id}`;
+                const shakeClass = currentLevelIndex > 0 ? `shake-${currentLevelIndex}` : 'shake-0';
+                el.className = `map-item target-item ${shakeClass}`;
                 el.innerText = target.emoji;
 
                 const x = 100 + Math.random() * (MAP_WIDTH - 200);
                 const y = 100 + Math.random() * (MAP_HEIGHT - 200);
+                wrapper.style.transform = `translate(${x}px, ${y}px)`;
                 
-                el.style.left = `${x}px`;
-                el.style.top = `${y}px`;
+                el.style.setProperty('--rot', '0deg');
+                el.style.setProperty('--scl', '1');
 
-                el.addEventListener('click', () => handleFindTarget(target.id, el));
-                el.addEventListener('touchstart', (e) => { e.preventDefault(); handleFindTarget(target.id, el); });
+                el.addEventListener('click', () => handleFindTarget(target.id, wrapper, el));
+                el.addEventListener('touchstart', (e) => { e.preventDefault(); handleFindTarget(target.id, wrapper, el); });
 
-                mapContainer.appendChild(el);
+                wrapper.appendChild(el);
+                mapContainer.appendChild(wrapper);
                 activeTargets.push({ ...target, found: false });
+
+                // Mục tiêu bay nhanh hơn vật nhiễu một chút
+                const speed = currentLevelIndex > 0 ? (currentLevelIndex * 2 + Math.random() * 3) : 0;
+                if (speed > 0) {
+                    const angle = Math.random() * Math.PI * 2;
+                    mapEntities.push({
+                        el: wrapper, x: x, y: y,
+                        vx: Math.cos(angle) * speed,
+                        vy: Math.sin(angle) * speed,
+                        id: target.id
+                    });
+                }
             });
 
             // 4. Khởi tạo Checklist
@@ -454,6 +526,10 @@
             posY = -(MAP_HEIGHT - window.innerHeight) / 2;
             updateMapPosition();
 
+            // Khởi động chuyển động các đồ vật
+            if (rAF_ID) cancelAnimationFrame(rAF_ID);
+            animateMap();
+
             // Hiện UI
             hudTop.classList.remove('hidden');
             checklistUI.classList.remove('hidden');
@@ -474,7 +550,7 @@
             }, 1000);
         }
 
-        function handleFindTarget(id, element) {
+        function handleFindTarget(id, wrapper, inner) {
             if (!isPlaying) return;
             
             const target = activeTargets.find(t => t.id === id);
@@ -483,8 +559,10 @@
                 foundCount++;
                 playSound('found');
 
-                element.classList.add('found-anim');
-                setTimeout(() => element.remove(), 500);
+                inner.classList.add('found-anim');
+                // Loại vật thể ra khỏi vòng lặp chuyển động để nó đứng yên khi bay màu
+                mapEntities = mapEntities.filter(e => e.id !== id); 
+                setTimeout(() => wrapper.remove(), 500);
 
                 document.getElementById(`check-${id}`).classList.add('found', 'bg-gray-200');
                 document.getElementById('found-count').innerText = foundCount;
