@@ -136,6 +136,19 @@
             white-space: nowrap;
         }
         
+        .float-text-bad {
+            position: absolute;
+            color: #ef4444; 
+            font-weight: 900;
+            font-size: 2.5rem;
+            pointer-events: none;
+            z-index: 100;
+            animation: floatUp 1s ease-out forwards;
+            text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff;
+            transform: translate(-50%, -50%);
+            white-space: nowrap;
+        }
+
         @keyframes floatUp {
             0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
             100% { transform: translate(-50%, -150%) scale(1.5); opacity: 0; }
@@ -234,9 +247,8 @@
                     <li>🎵 <b>Có Nhạc Nền Mới:</b> Giai điệu ngũ cung thư giãn.</li>
                     <li>🌍 <b>Bản Đồ Khổng Lồ:</b> Rộng hơn gấp nhiều lần, hãy kéo/vuốt mỏi tay!</li>
                     <li>🌪️ <b>Mọi Thứ Đều Bay:</b> Đồ vật sẽ di chuyển và rung lắc mạnh mẽ khi cấp độ tăng lên. Hãy nhanh tay chộp lấy chúng!</li>
-                    <li>🎁 <b>Vật Phẩm Trợ Giúp:</b> Chạm vào Đồng Hồ ⏳/⏰ để nhận thêm thời gian, hoặc Hộp Quà 🎁 để tự động tìm đồ giúp bạn!</li>
-                    <li>⏱️ <b>Thời Gian Gấp Rút:</b> Bạn có rất ít thời gian để tìm hàng chục món đồ.</li>
-                     <li>⏱️ <b>Game được phát hành bởi PN-293 </b> Chúc các bạn chơi game ức chế vui vẻ nha.</li>
+                    <li>⏳ <b>Đồng Hồ Hỗ Trợ:</b> Nhấp Đồng Hồ ⏳/⏰ để được cộng <span class="text-green-500 font-bold">+2 giây</span>!</li>
+                    <li>🎁 <b>Hộp Quà Nhân Phẩm:</b> Bấm Hộp Quà 🎁 để có cơ hội được tìm đồ giúp. Tuy nhiên cẩn thận vì <b class="text-red-500">60%</b> mở ra sẽ nổ bẫy (Bom, Lốc, Đóng băng)!</li>
                 </ul>
             </div>
 
@@ -251,7 +263,7 @@
         <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full text-center border-4 border-blue-400" id="levelWinModal">
             <div class="text-6xl mb-4 animate-bounce">🌟</div>
             <h2 class="text-3xl font-black text-blue-500 mb-2">Qua Màn!</h2>
-            <p class="text-gray-600 font-bold mb-6">Đôi mắt của bạn thật đáng gờm! Nhưng màn tiếp theo bản đồ sẽ còn RỘNG HƠN và thời gian sẽ ÍT HƠN nhiều đấy.</p>
+            <p id="levelWinText" class="text-gray-600 font-bold mb-6">Ủa qua được luôn hả? Chắc do ăn may. Chờ xem màn sau lé mắt luôn!</p>
             
             <button id="btnNextLevel" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_#1e3a8a] active:shadow-[0_0px_0_#1e3a8a] active:translate-y-[6px] transition-all">
                 ĐI TỚI MÀN TIẾP THEO ➡️
@@ -264,7 +276,7 @@
         <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full text-center border-4 border-red-500" id="loseModal">
             <div class="text-6xl mb-4">⏰</div>
             <h2 class="text-4xl font-black text-red-600 mb-2">Hết Giờ!</h2>
-            <p class="text-gray-600 font-bold mb-6">Bạn đã lạc trong không gian rộng lớn này. Đừng nản chí, hãy thử lại nào!</p>
+            <p id="loseText" class="text-gray-600 font-bold mb-6">Có nhiêu đó cũng tìm không ra! Đem mắt đi khám lẹ lên bạn ơi!</p>
             
             <button id="btnRestart" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_#9a3412] active:shadow-[0_0px_0_#9a3412] active:translate-y-[6px] transition-all">
                 CHƠI LẠI TỪ MÀN 1 🔄
@@ -277,7 +289,7 @@
         <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-md w-full text-center border-4 border-green-400" id="winModal">
             <div class="text-7xl mb-4 drop-shadow-lg">🏆</div>
             <h2 class="text-4xl font-black text-green-500 mb-2">PHÁ ĐẢO! 🎉</h2>
-            <p class="text-gray-600 font-bold mb-6">Thật không thể tin nổi! Bạn đã quét sạch bản đồ khổng lồ và thu thập đầy đủ mọi thứ!</p>
+            <p class="text-gray-600 font-bold mb-6">Đỉnh đấy, chắc cày mòn cả màn hình rồi chứ gì? Xứng đáng nhận cúp 'Mắt Cú Vọ'!</p>
             
             <div class="bg-yellow-50 p-4 rounded-xl mb-6 border border-yellow-200">
                 <p class="text-sm font-black text-yellow-800">DANH HIỆU: ĐÔI MẮT THẦN ĐIÊU CẤP ĐỘ VŨ TRỤ</p>
@@ -297,6 +309,21 @@
         let bgmInterval;
         let isBgmMuted = false;
         const PENTATONIC = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25]; // Âm giai ngũ cung
+
+        // Các câu chế giễu hài hước
+        const LEVEL_WIN_QUOTES = [
+            "Hên thôi chứ hay ho gì! Màn sau cho khóc thét nè.",
+            "Ủa qua được luôn hả? Chắc do ăn may. Chờ xem màn sau lé mắt luôn!",
+            "Cũng tạm đấy, nhưng mắt bạn sắp mờ rồi đúng không? Cố lên nha!",
+            "Mới qua được có xíu mà làm như giỏi lắm. Map sau bão táp ráng mà chịu!"
+        ];
+        
+        const LOSE_QUOTES = [
+            "Có nhiêu đó cũng tìm không ra! Đem con mắt đi khám lẹ lên bạn ơi!",
+            "Nói chậm tay mờ mắt lại tự ái. Chơi lại từ đầu cho chừa nha!",
+            "Ủa alo? Đang ngủ gật hay gì mà để hết giờ vậy?",
+            "Kém quá! Gà mờ thế này thì về nhà ngủ sớm đi chứ chơi bời gì!"
+        ];
 
         function initAudio() {
             if (!audioCtx) audioCtx = new AudioContext();
@@ -354,14 +381,6 @@
                 gain.gain.setValueAtTime(0.3, now); // Âm lượng to hơn BGM
                 gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
                 osc.start(now); osc.stop(now + 0.3);
-            } else if (type === 'powerup') { // THÊM MỚI: Âm thanh vật phẩm hỗ trợ
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(440, now);
-                osc.frequency.linearRampToValueAtTime(880, now + 0.1);
-                osc.frequency.linearRampToValueAtTime(1320, now + 0.2);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.3);
-                osc.start(now); osc.stop(now + 0.3);
             } else if (type === 'win') {
                 [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => { 
                     const o = audioCtx.createOscillator();
@@ -380,15 +399,45 @@
                 gain.gain.setValueAtTime(0.3, now);
                 gain.gain.linearRampToValueAtTime(0, now + 0.6);
                 osc.start(now); osc.stop(now + 0.6);
+            } else if (type === 'powerup') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(440, now);
+                osc.frequency.linearRampToValueAtTime(880, now + 0.1);
+                osc.frequency.linearRampToValueAtTime(1320, now + 0.2);
+                gain.gain.setValueAtTime(0.3, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+            } else if (type === 'trap_bomb') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(100, now);
+                osc.frequency.exponentialRampToValueAtTime(10, now + 0.5);
+                gain.gain.setValueAtTime(0.5, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.5);
+                osc.start(now); osc.stop(now + 0.5);
+            } else if (type === 'trap_freeze') {
+                osc.type = 'square';
+                osc.frequency.setValueAtTime(1200, now);
+                osc.frequency.linearRampToValueAtTime(800, now + 0.2);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 1.5);
+                osc.start(now); osc.stop(now + 1.5);
+            } else if (type === 'trap_tornado') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(50, now);
+                osc.frequency.linearRampToValueAtTime(300, now + 0.5);
+                osc.frequency.linearRampToValueAtTime(50, now + 1);
+                gain.gain.setValueAtTime(0.4, now);
+                gain.gain.linearRampToValueAtTime(0, now + 1);
+                osc.start(now); osc.stop(now + 1);
             }
         }
 
-        // --- CẤU HÌNH CÁC MÀN CHƠI CÓ THÊM BOOSTERS ---
+        // --- CẤU HÌNH CÁC MÀN CHƠI ---
         const LEVELS = [
-            { targets: 6, time: 45, mapW: 3000, mapH: 2000, decos: 300, boosters: 3 },   // Màn 1: Khởi động
-            { targets: 10, time: 40, mapW: 4500, mapH: 3000, decos: 600, boosters: 4 },  // Màn 2: Map rộng
-            { targets: 14, time: 35, mapW: 6000, mapH: 4000, decos: 1000, boosters: 5 }, // Màn 3: Áp lực thời gian
-            { targets: 16, time: 30, mapW: 8000, mapH: 5000, decos: 1500, boosters: 6 }  // Màn 4: Map khổng lồ, mù mắt
+            { targets: 6, time: 45, mapW: 3000, mapH: 2000, decos: 300 },   // Màn 1: Khởi động
+            { targets: 10, time: 40, mapW: 4500, mapH: 3000, decos: 600 },  // Màn 2: Map rộng
+            { targets: 14, time: 35, mapW: 6000, mapH: 4000, decos: 1000 }, // Màn 3: Áp lực thời gian
+            { targets: 16, time: 30, mapW: 8000, mapH: 5000, decos: 1500 }  // Màn 4: Map khổng lồ, mù mắt
         ];
 
         // 16 Vật phẩm mục tiêu
@@ -404,7 +453,8 @@
         ];
 
         const DECORATIONS = ['🌳', '🌲', '☁️', '🏘️', '🌾', '⛰️', '🌴', '🌸', '🪵', '🍄', '🌿', '🌻'];
-        const BOOSTERS = ['⏳', '⏰', '🎁']; // THÊM MỚI: 🎁 Tự động tìm đồ, ⏳⏰ Thêm thời gian
+        const BOOSTERS = ['⏳', '⏰', '🎁'];
+        const TRAPS = ['💣', '🧊', '🌪️'];
 
         // State variables
         let currentLevelIndex = 0;
@@ -508,13 +558,12 @@
                 el.style.setProperty('--rot', '0deg');
                 el.style.setProperty('--scl', '1');
 
+                // DÙNG LẠI EVENT GỐC NHƯ BẠN YÊU CẦU
                 el.addEventListener('click', () => handleFindTarget(target.id, wrapper, el));
                 el.addEventListener('touchstart', (e) => { e.preventDefault(); handleFindTarget(target.id, wrapper, el); });
 
                 wrapper.appendChild(el);
                 mapContainer.appendChild(wrapper);
-                
-                // THÊM MỚI: Gắn thêm wrapper và inner vào mảng để Hộp Quà 🎁 có thể bấm giùm
                 activeTargets.push({ ...target, found: false, wrapper: wrapper, inner: el });
 
                 // Mục tiêu bay nhanh hơn vật nhiễu một chút
@@ -530,43 +579,41 @@
                 }
             });
 
-            // THÊM MỚI: 4. Rải Vật Phẩm Hỗ Trợ (Boosters)
-            if (levelConfig.boosters) {
-                for (let i = 0; i < levelConfig.boosters; i++) {
-                    const wrapper = document.createElement('div');
-                    wrapper.className = 'map-wrapper';
+            // 4. Rải Boosters (Vật phẩm cộng thời gian)
+            // Lượng booster sẽ tăng dần theo màn
+            const boosterAmount = currentLevelIndex + 3;
+            for (let i = 0; i < boosterAmount; i++) {
+                const wrapper = document.createElement('div');
+                wrapper.className = 'map-wrapper';
 
-                    const boosterType = BOOSTERS[Math.floor(Math.random() * BOOSTERS.length)];
-                    const el = document.createElement('div');
-                    const shakeClass = currentLevelIndex > 0 ? `shake-${currentLevelIndex}` : 'shake-0';
-                    el.className = `map-item powerup-item ${shakeClass}`;
-                    el.innerText = boosterType;
+                const boosterType = BOOSTERS[Math.floor(Math.random() * BOOSTERS.length)];
+                const el = document.createElement('div');
+                const shakeClass = currentLevelIndex > 0 ? `shake-${currentLevelIndex}` : 'shake-0';
+                el.className = `map-item powerup-item ${shakeClass}`;
+                el.innerText = boosterType;
 
-                    const x = 100 + Math.random() * (MAP_WIDTH - 200);
-                    const y = 100 + Math.random() * (MAP_HEIGHT - 200);
-                    wrapper.style.transform = `translate(${x}px, ${y}px)`;
-                    
-                    el.style.setProperty('--rot', '0deg');
-                    el.style.setProperty('--scl', '1');
+                const x = 100 + Math.random() * (MAP_WIDTH - 200);
+                const y = 100 + Math.random() * (MAP_HEIGHT - 200);
+                wrapper.style.transform = `translate(${x}px, ${y}px)`;
+                
+                el.style.setProperty('--rot', '0deg');
+                el.style.setProperty('--scl', '1');
 
-                    // Gắn sự kiện click
-                    el.addEventListener('click', (e) => { e.stopPropagation(); handleFindBooster(wrapper, el, boosterType); });
-                    el.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); handleFindBooster(wrapper, el, boosterType); });
+                el.addEventListener('click', (e) => { e.stopPropagation(); handleFindBooster(wrapper, el, boosterType); });
+                el.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); handleFindBooster(wrapper, el, boosterType); });
 
-                    wrapper.appendChild(el);
-                    mapContainer.appendChild(wrapper);
+                wrapper.appendChild(el);
+                mapContainer.appendChild(wrapper);
 
-                    // Chuyển động bay nhanh hơn bình thường một chút
-                    const speed = currentLevelIndex > 0 ? (currentLevelIndex * 2 + Math.random() * 2) : 1;
-                    if (speed > 0) {
-                        const angle = Math.random() * Math.PI * 2;
-                        mapEntities.push({
-                            el: wrapper, x: x, y: y,
-                            vx: Math.cos(angle) * speed,
-                            vy: Math.sin(angle) * speed
-                        });
-                    }
-                }
+                // Booster bay nhanh hơn một chút để người chơi phải đuổi theo
+                const speed = currentLevelIndex > 0 ? (currentLevelIndex * 2.5 + Math.random() * 3) : 1.5;
+                const angle = Math.random() * Math.PI * 2;
+                mapEntities.push({
+                    el: wrapper, x: x, y: y,
+                    vx: Math.cos(angle) * speed,
+                    vy: Math.sin(angle) * speed,
+                    isBooster: true
+                });
             }
 
             // 5. Khởi tạo Checklist
@@ -579,7 +626,7 @@
                 `;
             });
             
-            // 6. Cập nhật HUD
+            // Cập nhật HUD
             document.getElementById('total-count').innerText = levelConfig.targets;
             document.getElementById('level-display').innerText = currentLevelIndex + 1;
             timeRemaining = levelConfig.time;
@@ -658,7 +705,7 @@
             }
         }
 
-        // THÊM MỚI: Xử lý vật phẩm hỗ trợ
+        // Xử lý Vật phẩm hỗ trợ & Bẫy Ẩn
         function handleFindBooster(wrapper, inner, type) {
             if (!isPlaying) return;
             
@@ -672,18 +719,17 @@
                 mapEntities.splice(entityIndex, 1); // Rút khỏi vòng lặp bay
             }
             
-            playSound('powerup');
-            
-            // Tạo chữ nổi
             const floatText = document.createElement('div');
-            floatText.className = 'float-text';
             floatText.style.left = `${posX}px`;
             floatText.style.top = `${posY}px`;
 
             if (type === '⏳' || type === '⏰') {
-                timeRemaining += 10;
+                playSound('powerup');
+                timeRemaining += 2; // CHỈ CÒN CỘNG 2 GIÂY
                 updateTimerDisplay();
-                floatText.innerText = '+10s';
+                
+                floatText.className = 'float-text';
+                floatText.innerText = '+2s';
                 
                 const timerEl = document.getElementById('timer');
                 timerEl.classList.remove('text-red-600', 'animate-pulse');
@@ -694,15 +740,52 @@
                     timerEl.style.transform = '';
                 }, 500);
             } else if (type === '🎁') {
-                // Tìm tự động 1 vật chưa có
-                const unfound = activeTargets.filter(t => !t.found);
-                if (unfound.length > 0) {
-                    const randomTarget = unfound[Math.floor(Math.random() * unfound.length)];
-                    floatText.innerText = 'Tìm giúp: ' + randomTarget.emoji;
-                    // Kích hoạt hàm click giùm người chơi
-                    handleFindTarget(randomTarget.id, randomTarget.wrapper, randomTarget.inner);
+                // CHƠI HỆ NHÂN PHẨM: 40% Tốt, 60% Dính Bẫy
+                const isLucky = Math.random() < 0.4;
+                
+                if (isLucky) {
+                    playSound('powerup');
+                    floatText.className = 'float-text';
+                    const unfound = activeTargets.filter(t => !t.found);
+                    if (unfound.length > 0) {
+                        const randomTarget = unfound[Math.floor(Math.random() * unfound.length)];
+                        floatText.innerText = 'May mắn: ' + randomTarget.emoji;
+                        // Kích hoạt hàm click giùm người chơi
+                        handleFindTarget(randomTarget.id, randomTarget.wrapper, randomTarget.inner);
+                    } else {
+                        floatText.innerText = 'Trống rỗng!';
+                    }
                 } else {
-                    floatText.innerText = 'Trống rỗng!';
+                    // Dính Bẫy
+                    floatText.className = 'float-text-bad';
+                    const badType = TRAPS[Math.floor(Math.random() * TRAPS.length)];
+                    floatText.innerText = 'Xui xẻo: ' + badType;
+                    
+                    if (badType === '💣') { 
+                        playSound('trap_bomb');
+                        timeRemaining = Math.max(0, timeRemaining - 5);
+                        updateTimerDisplay();
+                        const timerEl = document.getElementById('timer');
+                        timerEl.classList.add('text-red-600', 'scale-125');
+                        setTimeout(() => timerEl.classList.remove('text-red-600', 'scale-125'), 500);
+                    } else if (badType === '🧊') { 
+                        playSound('trap_freeze');
+                        const freezeOverlay = document.getElementById('freeze-overlay');
+                        freezeOverlay.classList.remove('hidden');
+                        isDragging = false; 
+                        void freezeOverlay.offsetWidth;
+                        freezeOverlay.classList.add('active');
+                        setTimeout(() => {
+                            freezeOverlay.classList.remove('active');
+                            setTimeout(() => freezeOverlay.classList.add('hidden'), 300);
+                        }, 1500);
+                    } else if (badType === '🌪️') {
+                        playSound('trap_tornado');
+                        mapContainer.style.filter = 'blur(12px)';
+                        setTimeout(() => {
+                            mapContainer.style.filter = 'none';
+                        }, 2000);
+                    }
                 }
             }
 
@@ -725,10 +808,10 @@
             playSound('win');
             
             if (currentLevelIndex < LEVELS.length - 1) {
-                // Còn màn tiếp theo
+                // Thay đổi câu thoại troll ngẫu nhiên
+                document.getElementById('levelWinText').innerText = LEVEL_WIN_QUOTES[Math.floor(Math.random() * LEVEL_WIN_QUOTES.length)];
                 showScreen('levelWinScreen');
             } else {
-                // Đã vượt qua mọi màn
                 showScreen('winScreen');
             }
         }
@@ -737,6 +820,9 @@
             isPlaying = false;
             clearInterval(timerInterval);
             playSound('lose');
+            
+            // Thay đổi câu thoại troll ngẫu nhiên
+            document.getElementById('loseText').innerText = LOSE_QUOTES[Math.floor(Math.random() * LOSE_QUOTES.length)];
             showScreen('loseScreen');
         }
 
@@ -761,7 +847,7 @@
             screen.classList.remove('opacity-0');
         }
 
-        // --- PANNING LOGIC ĐƯỢC GIỮ NGUYÊN 100% NHƯ CODE CỦA BẠN ---
+        // --- PANNING LOGIC ĐƯỢC GIỮ NGUYÊN ---
         let isDragging = false;
         let startX, startY;
         let posX = 0, posY = 0;
