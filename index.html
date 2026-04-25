@@ -1,0 +1,563 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Truy Tìm Đặc Sản Việt Nam (Bản Khó)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Nunito', sans-serif;
+            margin: 0;
+            overflow: hidden;
+            background-color: #fdf6e3;
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none;
+        }
+
+        #viewport {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+            cursor: grab;
+        }
+        
+        #viewport:active {
+            cursor: grabbing;
+        }
+
+        #map-container {
+            /* Width and Height will be set dynamically via JS */
+            background-color: #fdf6e3;
+            background-image: 
+                radial-gradient(#fbbf24 2px, transparent 2px),
+                radial-gradient(#fbbf24 2px, transparent 2px);
+            background-size: 60px 60px;
+            background-position: 0 0, 30px 30px;
+            position: absolute;
+            top: 0;
+            left: 0;
+            transform-origin: 0 0;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
+        }
+
+        .map-item {
+            position: absolute;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: translate(-50%, -50%);
+            transition: transform 0.2s;
+        }
+
+        .target-item {
+            cursor: pointer;
+            z-index: 10;
+            font-size: 4rem;
+            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
+            animation: float 3s ease-in-out infinite;
+        }
+
+        .target-item:hover {
+            transform: translate(-50%, -50%) scale(1.1);
+            filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.8));
+        }
+
+        .deco-item {
+            font-size: 3rem;
+            opacity: 0.7;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes popOut {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
+            100% { transform: translate(-50%, -50%) scale(0) rotate(45deg); opacity: 0; }
+        }
+        
+        .found-anim {
+            animation: popOut 0.5s ease-out forwards;
+            pointer-events: none;
+        }
+
+        @keyframes float {
+            0%, 100% { margin-top: 0; }
+            50% { margin-top: -10px; }
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(251, 191, 36, 0.5);
+        }
+
+        #checklist {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 50;
+            width: 95%;
+            max-width: 800px;
+            border-radius: 1.5rem;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        }
+
+        /* Check items with custom scrollbar */
+        #checklist-items {
+            overflow-x: auto;
+            scrollbar-width: thin;
+        }
+        #checklist-items::-webkit-scrollbar { height: 6px; }
+        #checklist-items::-webkit-scrollbar-track { background: #fef3c7; border-radius: 10px;}
+        #checklist-items::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 10px;}
+
+        .check-item {
+            transition: all 0.3s;
+            flex-shrink: 0;
+        }
+        .check-item.found {
+            opacity: 0.3;
+            filter: grayscale(100%);
+            transform: scale(0.85);
+        }
+
+    </style>
+</head>
+<body>
+
+    <div id="viewport">
+        <div id="map-container"></div>
+    </div>
+
+    <!-- Thanh HUD trên cùng -->
+    <div id="hud-top" class="fixed top-4 left-4 right-4 z-50 flex justify-between pointer-events-none hidden gap-2">
+        <!-- Level -->
+        <div class="glass-panel px-4 py-2 rounded-2xl shadow-md pointer-events-auto text-center flex-1 max-w-[120px]">
+            <p class="text-[10px] md:text-xs font-bold text-blue-500 uppercase">Màn Chơi</p>
+            <p class="text-xl md:text-2xl font-black text-gray-800" id="level-display">1</p>
+        </div>
+        
+        <!-- Timer -->
+        <div class="glass-panel px-4 py-2 rounded-2xl shadow-md pointer-events-auto text-center flex-1 max-w-[150px]">
+            <p class="text-[10px] md:text-xs font-bold text-red-500 uppercase">Thời gian</p>
+            <p class="text-xl md:text-2xl font-black text-gray-800 transition-colors duration-300" id="timer">00:00</p>
+        </div>
+        
+        <!-- Progress -->
+        <div class="glass-panel px-4 py-2 rounded-2xl shadow-md pointer-events-auto text-center flex-1 max-w-[150px]">
+            <p class="text-[10px] md:text-xs font-bold text-orange-500 uppercase">Đã thu thập</p>
+            <p class="text-xl md:text-2xl font-black text-gray-800"><span id="found-count">0</span>/<span id="total-count">8</span></p>
+        </div>
+    </div>
+
+    <!-- Thanh Checklist dưới cùng -->
+    <div id="checklist" class="glass-panel p-3 hidden">
+        <p class="text-center text-[10px] md:text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest border-b border-gray-200 pb-1">Sổ Tay Cần Tìm</p>
+        <div class="flex justify-start md:justify-center items-center gap-2 pb-2" id="checklist-items">
+            <!-- JS render checklist -->
+        </div>
+    </div>
+
+    <!-- Màn hình Khởi Đầu -->
+    <div id="startScreen" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-opacity duration-300">
+        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-md w-full text-center border-4 border-yellow-400 relative overflow-hidden">
+            <div class="absolute -top-10 -left-10 text-[8rem] opacity-10">🗺️</div>
+            
+            <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-2">Truy Tìm Đặc Sản</h1>
+            <p class="text-red-600 font-bold uppercase tracking-widest text-sm mb-6 bg-red-100 inline-block px-4 py-1 rounded-full animate-pulse">Chế độ Hardcore</p>
+            
+            <div class="bg-gray-50 p-4 rounded-xl text-left mb-6 border border-gray-200">
+                <p class="font-bold text-gray-800 mb-2 text-center border-b pb-2">📜 Thử Thách Mới:</p>
+                <ul class="text-sm text-gray-600 space-y-2 font-semibold">
+                    <li>⏱️ <b>Giới hạn thời gian:</b> Bạn phải tìm đủ đồ trước khi đồng hồ điểm 0!</li>
+                    <li>📈 <b>Độ khó tăng dần:</b> Bản đồ ngày càng to, đồ vật cần tìm ngày càng nhiều.</li>
+                    <li>🎯 Vượt qua 4 Màn Chơi để trở thành Bậc Thầy Khám Phá!</li>
+                </ul>
+            </div>
+
+            <button id="btnStart" class="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_#991b1b] active:shadow-[0_0px_0_#991b1b] active:translate-y-[6px] transition-all">
+                CHẤP NHẬN THỬ THÁCH 🚀
+            </button>
+        </div>
+    </div>
+
+    <!-- Màn hình Qua Màn (Level Up) -->
+    <div id="levelWinScreen" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full text-center border-4 border-blue-400" id="levelWinModal">
+            <div class="text-6xl mb-4 animate-bounce">🌟</div>
+            <h2 class="text-3xl font-black text-blue-500 mb-2">Qua Màn!</h2>
+            <p class="text-gray-600 font-bold mb-6">Bạn có đôi mắt tinh tường đấy! Nhưng màn tiếp theo bản đồ sẽ rộng hơn và thời gian ít hơn.</p>
+            
+            <button id="btnNextLevel" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_#1e3a8a] active:shadow-[0_0px_0_#1e3a8a] active:translate-y-[6px] transition-all">
+                ĐI TỚI MÀN TIẾP THEO ➡️
+            </button>
+        </div>
+    </div>
+
+    <!-- Màn hình Thua (Game Over) -->
+    <div id="loseScreen" class="fixed inset-0 bg-red-900/80 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
+        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full text-center border-4 border-red-500" id="loseModal">
+            <div class="text-6xl mb-4">⏰</div>
+            <h2 class="text-4xl font-black text-red-600 mb-2">Hết Giờ!</h2>
+            <p class="text-gray-600 font-bold mb-6">Bạn chưa thu thập đủ sổ tay. Hãy nhanh tay và tinh mắt hơn nhé!</p>
+            
+            <button id="btnRestart" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_#9a3412] active:shadow-[0_0px_0_#9a3412] active:translate-y-[6px] transition-all">
+                CHƠI LẠI TỪ MÀN 1 🔄
+            </button>
+        </div>
+    </div>
+
+    <!-- Màn hình Phá Đảo (Game Complete) -->
+    <div id="winScreen" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-500">
+        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-md w-full text-center border-4 border-green-400" id="winModal">
+            <div class="text-7xl mb-4 drop-shadow-lg">🏆</div>
+            <h2 class="text-4xl font-black text-green-500 mb-2">PHÁ ĐẢO! 🎉</h2>
+            <p class="text-gray-600 font-bold mb-6">Bạn đã vượt qua mọi giới hạn và lấp đầy toàn bộ sổ tay của tất cả các cấp độ!</p>
+            
+            <div class="bg-yellow-50 p-4 rounded-xl mb-6 border border-yellow-200">
+                <p class="text-sm font-black text-yellow-800">DANH HIỆU: ĐÔI MẮT THẦN ĐIÊU</p>
+            </div>
+
+            <button onclick="location.reload()" class="w-full bg-green-500 hover:bg-green-600 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_#14532d] active:shadow-[0_0px_0_#14532d] active:translate-y-[6px] transition-all">
+                TRỞ VỀ TRANG CHỦ 🏠
+            </button>
+        </div>
+    </div>
+
+    <!-- JavaScript Game Logic -->
+    <script>
+        // --- ÂM THANH ---
+        const AudioContext = window.AudioContext || window.webkitAudioContext;
+        let audioCtx;
+
+        function initAudio() {
+            if (!audioCtx) audioCtx = new AudioContext();
+            if (audioCtx.state === 'suspended') audioCtx.resume();
+        }
+
+        function playSound(type) {
+            if (!audioCtx) return;
+            const now = audioCtx.currentTime;
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+
+            if (type === 'found') {
+                osc.type = 'sine';
+                osc.frequency.setValueAtTime(880, now);
+                osc.frequency.exponentialRampToValueAtTime(1760, now + 0.1);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
+                osc.start(now); osc.stop(now + 0.3);
+            } else if (type === 'win') {
+                [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => { 
+                    const o = audioCtx.createOscillator();
+                    const g = audioCtx.createGain();
+                    o.type = 'triangle';
+                    o.connect(g); g.connect(audioCtx.destination);
+                    o.frequency.value = freq;
+                    g.gain.setValueAtTime(0.15, now + i * 0.15);
+                    g.gain.linearRampToValueAtTime(0, now + i * 0.15 + 0.5);
+                    o.start(now + i * 0.15); o.stop(now + i * 0.15 + 0.5);
+                });
+            } else if (type === 'lose') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(80, now + 0.6);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.6);
+                osc.start(now); osc.stop(now + 0.6);
+            }
+        }
+
+        // --- CẤU HÌNH CÁC MÀN CHƠI (LEVELS) ---
+        const LEVELS = [
+            { targets: 5, time: 60, mapW: 2000, mapH: 1500, decos: 150 }, // Màn 1: Dễ
+            { targets: 8, time: 50, mapW: 3000, mapH: 2000, decos: 300 }, // Màn 2: Vừa
+            { targets: 12, time: 45, mapW: 4000, mapH: 2500, decos: 500 }, // Màn 3: Khó
+            { targets: 15, time: 40, mapW: 5000, mapH: 3000, decos: 800 }  // Màn 4: Rất Khó
+        ];
+
+        // Kho vật phẩm phong phú hơn để xáo trộn
+        const ALL_TARGETS = [
+            { id: 'pho', emoji: '🍜' }, { id: 'coffee', emoji: '☕' },
+            { id: 'banhmi', emoji: '🥖' }, { id: 'lantern', emoji: '🏮' },
+            { id: 'hat', emoji: '👒' }, { id: 'scooter', emoji: '🛵' },
+            { id: 'lotus', emoji: '🪷' }, { id: 'boat', emoji: '🛶' },
+            { id: 'dumpling', emoji: '🥟' }, { id: 'bicycle', emoji: '🚲' },
+            { id: 'coconut', emoji: '🥥' }, { id: 'watermelon', emoji: '🍉' },
+            { id: 'starfruit', emoji: '🍍' }, { id: 'crab', emoji: '🦀' },
+            { id: 'temple', emoji: '⛩️' }, { id: 'buffalo', emoji: '🐃' }
+        ];
+
+        const DECORATIONS = ['🌳', '🌲', '☁️', '🏘️', '🌾', '⛰️', '🌴', '🌸', '🪵', '🍄'];
+
+        // State variables
+        let currentLevelIndex = 0;
+        let MAP_WIDTH = 0;
+        let MAP_HEIGHT = 0;
+        
+        let isPlaying = false;
+        let foundCount = 0;
+        let timeRemaining = 0;
+        let timerInterval;
+        let activeTargets = [];
+
+        // DOM Elements
+        const mapContainer = document.getElementById('map-container');
+        const viewport = document.getElementById('viewport');
+        const hudTop = document.getElementById('hud-top');
+        const checklistUI = document.getElementById('checklist');
+        const checklistItemsDiv = document.getElementById('checklist-items');
+        
+        // --- LOGIC SINH BẢN ĐỒ ---
+        function generateMap() {
+            const levelConfig = LEVELS[currentLevelIndex];
+            MAP_WIDTH = levelConfig.mapW;
+            MAP_HEIGHT = levelConfig.mapH;
+            
+            mapContainer.style.width = `${MAP_WIDTH}px`;
+            mapContainer.style.height = `${MAP_HEIGHT}px`;
+            mapContainer.innerHTML = ''; 
+            activeTargets = [];
+
+            // 1. Rải vật thể nhiễu
+            for (let i = 0; i < levelConfig.decos; i++) {
+                const deco = document.createElement('div');
+                deco.className = 'map-item deco-item';
+                deco.innerText = DECORATIONS[Math.floor(Math.random() * DECORATIONS.length)];
+                
+                const x = 50 + Math.random() * (MAP_WIDTH - 100);
+                const y = 50 + Math.random() * (MAP_HEIGHT - 100);
+                
+                deco.style.left = `${x}px`;
+                deco.style.top = `${y}px`;
+                deco.style.transform = `translate(-50%, -50%) rotate(${(Math.random()-0.5)*30}deg) scale(${0.7 + Math.random()*0.6})`;
+                
+                mapContainer.appendChild(deco);
+            }
+
+            // 2. Lấy ngẫu nhiên N vật phẩm cần tìm
+            const shuffledTargets = [...ALL_TARGETS].sort(() => 0.5 - Math.random());
+            const selectedTargets = shuffledTargets.slice(0, levelConfig.targets);
+
+            // 3. Rải Mục tiêu lên bản đồ
+            selectedTargets.forEach(target => {
+                const el = document.createElement('div');
+                el.className = 'map-item target-item';
+                el.id = `map-item-${target.id}`;
+                el.innerText = target.emoji;
+
+                const x = 100 + Math.random() * (MAP_WIDTH - 200);
+                const y = 100 + Math.random() * (MAP_HEIGHT - 200);
+                
+                el.style.left = `${x}px`;
+                el.style.top = `${y}px`;
+
+                el.addEventListener('click', () => handleFindTarget(target.id, el));
+                el.addEventListener('touchstart', (e) => { e.preventDefault(); handleFindTarget(target.id, el); });
+
+                mapContainer.appendChild(el);
+                activeTargets.push({ ...target, found: false });
+            });
+
+            // 4. Khởi tạo Checklist
+            checklistItemsDiv.innerHTML = '';
+            selectedTargets.forEach(target => {
+                checklistItemsDiv.innerHTML += `
+                    <div id="check-${target.id}" class="check-item flex flex-col items-center bg-white p-2 md:p-3 rounded-xl shadow-sm border-2 border-gray-100 min-w-[50px] md:min-w-[60px]">
+                        <span class="text-2xl md:text-3xl drop-shadow-sm">${target.emoji}</span>
+                    </div>
+                `;
+            });
+            
+            // 5. Cập nhật HUD
+            document.getElementById('total-count').innerText = levelConfig.targets;
+            document.getElementById('level-display').innerText = currentLevelIndex + 1;
+            timeRemaining = levelConfig.time;
+            updateTimerDisplay();
+        }
+
+        // --- CÁC HÀM ĐIỀU KHIỂN GAME ---
+        function startGame() {
+            initAudio();
+            currentLevelIndex = 0;
+            startLevel();
+            document.getElementById('startScreen').classList.add('opacity-0', 'pointer-events-none');
+        }
+
+        function startLevel() {
+            generateMap();
+            
+            foundCount = 0;
+            isPlaying = true;
+            document.getElementById('found-count').innerText = foundCount;
+            
+            // Xóa cảnh báo đỏ nếu có
+            document.getElementById('timer').classList.remove('text-red-600', 'animate-pulse');
+
+            // Căn giữa bản đồ
+            posX = -(MAP_WIDTH - window.innerWidth) / 2;
+            posY = -(MAP_HEIGHT - window.innerHeight) / 2;
+            updateMapPosition();
+
+            // Hiện UI
+            hudTop.classList.remove('hidden');
+            checklistUI.classList.remove('hidden');
+            hideAllScreens();
+
+            clearInterval(timerInterval);
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+
+                if (timeRemaining <= 10) {
+                    document.getElementById('timer').classList.add('text-red-600', 'animate-pulse');
+                }
+
+                if (timeRemaining <= 0) {
+                    gameOver();
+                }
+            }, 1000);
+        }
+
+        function handleFindTarget(id, element) {
+            if (!isPlaying) return;
+            
+            const target = activeTargets.find(t => t.id === id);
+            if (target && !target.found) {
+                target.found = true;
+                foundCount++;
+                playSound('found');
+
+                element.classList.add('found-anim');
+                setTimeout(() => element.remove(), 500);
+
+                document.getElementById(`check-${id}`).classList.add('found', 'bg-gray-200');
+                document.getElementById('found-count').innerText = foundCount;
+
+                // Win Condition for Current Level
+                if (foundCount === LEVELS[currentLevelIndex].targets) {
+                    levelComplete();
+                }
+            }
+        }
+
+        function updateTimerDisplay() {
+            const m = Math.floor(Math.max(0, timeRemaining) / 60).toString().padStart(2, '0');
+            const s = (Math.max(0, timeRemaining) % 60).toString().padStart(2, '0');
+            document.getElementById('timer').innerText = `${m}:${s}`;
+        }
+
+        function levelComplete() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            playSound('win');
+            
+            if (currentLevelIndex < LEVELS.length - 1) {
+                // Còn màn tiếp theo
+                showScreen('levelWinScreen');
+            } else {
+                // Đã vượt qua mọi màn
+                showScreen('winScreen');
+            }
+        }
+
+        function gameOver() {
+            isPlaying = false;
+            clearInterval(timerInterval);
+            playSound('lose');
+            showScreen('loseScreen');
+        }
+
+        // --- QUẢN LÝ MÀN HÌNH UI ---
+        function hideAllScreens() {
+            const screens = ['levelWinScreen', 'loseScreen', 'winScreen'];
+            screens.forEach(id => {
+                const el = document.getElementById(id);
+                el.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => el.classList.add('hidden'), 300); // Đợi CSS transition chạy xong
+            });
+        }
+
+        function showScreen(id) {
+            hudTop.classList.add('hidden');
+            checklistUI.classList.add('hidden');
+            
+            const screen = document.getElementById(id);
+            screen.classList.remove('hidden', 'pointer-events-none');
+            // Trigger reflow
+            void screen.offsetWidth;
+            screen.classList.remove('opacity-0');
+        }
+
+        // --- PANNING LOGIC ---
+        let isDragging = false;
+        let startX, startY;
+        let posX = 0, posY = 0;
+
+        function updateMapPosition() {
+            const minX = window.innerWidth - MAP_WIDTH;
+            const minY = window.innerHeight - MAP_HEIGHT;
+            
+            posX = Math.min(0, Math.max(minX, posX));
+            posY = Math.min(0, Math.max(minY, posY));
+
+            mapContainer.style.transform = `translate(${posX}px, ${posY}px)`;
+        }
+
+        // Mouse Events
+        viewport.addEventListener('mousedown', (e) => {
+            isDragging = true;
+            startX = e.clientX - posX;
+            startY = e.clientY - posY;
+        });
+        window.addEventListener('mousemove', (e) => {
+            if (!isDragging) return;
+            posX = e.clientX - startX;
+            posY = e.clientY - startY;
+            updateMapPosition();
+        });
+        window.addEventListener('mouseup', () => { isDragging = false; });
+        window.addEventListener('mouseleave', () => { isDragging = false; });
+
+        // Touch Events
+        viewport.addEventListener('touchstart', (e) => {
+            if (e.touches.length === 1) {
+                isDragging = true;
+                startX = e.touches[0].clientX - posX;
+                startY = e.touches[0].clientY - posY;
+            }
+        }, { passive: false });
+        window.addEventListener('touchmove', (e) => {
+            if (!isDragging || e.touches.length !== 1) return;
+            e.preventDefault();
+            posX = e.touches[0].clientX - startX;
+            posY = e.touches[0].clientY - startY;
+            updateMapPosition();
+        }, { passive: false });
+        window.addEventListener('touchend', () => { isDragging = false; });
+
+        window.addEventListener('resize', updateMapPosition);
+
+        // --- BUTTON BINDINGS ---
+        document.getElementById('btnStart').addEventListener('click', startGame);
+        document.getElementById('btnRestart').addEventListener('click', () => {
+            hideAllScreens();
+            setTimeout(startGame, 300);
+        });
+        document.getElementById('btnNextLevel').addEventListener('click', () => {
+            hideAllScreens();
+            currentLevelIndex++;
+            setTimeout(startLevel, 300);
+        });
+
+    </script>
+</body>
+</html>
