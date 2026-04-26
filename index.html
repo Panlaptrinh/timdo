@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Hành Trình Mắt Thần: Khám Phá Việt Nam</title>
+    <title>Tinh Hoa Việt Nam: Tuyệt Đỉnh Xếp Hình</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;900&display=swap" rel="stylesheet">
     <style>
@@ -12,272 +12,209 @@
             margin: 0;
             overflow: hidden;
             background-color: #fdf6e3;
-            user-select: none;
-            -webkit-user-select: none;
-            touch-action: none;
-        }
-
-        #viewport {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
-            cursor: grab;
-        }
-        
-        #viewport:active {
-            cursor: grabbing;
-        }
-
-        #map-container {
-            /* Width and Height will be set dynamically via JS */
-            background-color: #fdf6e3;
             background-image: 
                 radial-gradient(#fbbf24 2px, transparent 2px),
                 radial-gradient(#fbbf24 2px, transparent 2px);
             background-size: 60px 60px;
             background-position: 0 0, 30px 30px;
-            position: absolute;
-            top: 0;
-            left: 0;
-            transform-origin: 0 0;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.1);
-        }
-
-        /* Lớp bọc ngoài để xử lý di chuyển bằng JavaScript */
-        .map-wrapper {
-            position: absolute;
-            top: 0;
-            left: 0;
-            will-change: transform;
-        }
-
-        /* Lớp bên trong để xử lý rung lắc bằng CSS */
-        .map-item {
-            position: relative;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transform: translate(-50%, -50%) rotate(var(--rot, 0deg)) scale(var(--scl, 1));
-        }
-
-        .target-item {
-            cursor: pointer;
-            z-index: 10;
-            font-size: 4rem;
-            filter: drop-shadow(2px 4px 6px rgba(0,0,0,0.2));
-        }
-
-        .target-item:hover {
-            --scl: 1.2 !important;
-            filter: drop-shadow(0 0 15px rgba(251, 191, 36, 0.8));
-        }
-
-        .deco-item {
-            font-size: 3rem;
-            opacity: 0.7;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        /* Hiệu ứng Rung lắc (Jitter) & Nổi (Float) */
-        @keyframes jitter {
-            0%, 100% { margin-left: 0; margin-top: 0; }
-            25% { margin-left: var(--jx); margin-top: calc(var(--jy) * -1); }
-            50% { margin-left: calc(var(--jx) * -1); margin-top: var(--jy); }
-            75% { margin-left: calc(var(--jx) * -1); margin-top: calc(var(--jy) * -1); }
-        }
-
-        .shake-0 { animation: float 3s ease-in-out infinite; }
-        .shake-1 { --jx: 2px; --jy: 2px; animation: jitter 0.15s infinite; }
-        .shake-2 { --jx: 5px; --jy: 5px; animation: jitter 0.08s infinite; }
-        .shake-3 { --jx: 10px; --jy: 10px; animation: jitter 0.04s infinite; }
-
-        @keyframes popOut {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            50% { transform: translate(-50%, -50%) scale(1.5); opacity: 1; }
-            100% { transform: translate(-50%, -50%) scale(0) rotate(45deg); opacity: 0; }
-        }
-        
-        .found-anim {
-            animation: popOut 0.5s ease-out forwards;
-            pointer-events: none;
-        }
-
-        @keyframes float {
-            0%, 100% { margin-top: 0; }
-            50% { margin-top: -10px; }
-        }
-
-        /* THÊM MỚI: CSS Vật phẩm hỗ trợ & Chữ nổi */
-        .powerup-item {
-            cursor: pointer;
-            z-index: 15;
-            font-size: 3.5rem;
-            filter: drop-shadow(0 0 15px rgba(16, 185, 129, 0.9));
-            padding: 15px; 
-        }
-
-        .powerup-item:hover {
-            --scl: 1.2 !important;
-            filter: drop-shadow(0 0 25px rgba(16, 185, 129, 1));
-        }
-
-        .float-text {
-            position: absolute;
-            color: #10b981;
-            font-weight: 900;
-            font-size: 2.5rem;
-            pointer-events: none;
-            z-index: 100;
-            animation: floatUp 1s ease-out forwards;
-            text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff;
-            transform: translate(-50%, -50%);
-            white-space: nowrap;
-        }
-        
-        .float-text-bad {
-            position: absolute;
-            color: #ef4444; 
-            font-weight: 900;
-            font-size: 2.5rem;
-            pointer-events: none;
-            z-index: 100;
-            animation: floatUp 1s ease-out forwards;
-            text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff;
-            transform: translate(-50%, -50%);
-            white-space: nowrap;
-        }
-
-        @keyframes floatUp {
-            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
-            100% { transform: translate(-50%, -150%) scale(1.5); opacity: 0; }
+            user-select: none;
+            -webkit-user-select: none;
+            touch-action: none; /* Khóa thao tác cuộn web */
         }
 
         .glass-panel {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
             border: 2px solid rgba(251, 191, 36, 0.5);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
         }
 
-        #checklist {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 50;
-            width: 95%;
-            max-width: 800px;
-            border-radius: 1.5rem;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+        /* --- CẤU TRÚC GAME BẢNG (MATCH-3 BOARD) --- */
+        #game-area {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
         }
 
-        /* Check items with custom scrollbar */
-        #checklist-items {
-            overflow-x: auto;
-            scrollbar-width: thin;
-        }
-        #checklist-items::-webkit-scrollbar { height: 6px; }
-        #checklist-items::-webkit-scrollbar-track { background: #fef3c7; border-radius: 10px;}
-        #checklist-items::-webkit-scrollbar-thumb { background: #f59e0b; border-radius: 10px;}
-
-        .check-item {
-            transition: all 0.3s;
-            flex-shrink: 0;
-        }
-        .check-item.found {
-            opacity: 0.3;
-            filter: grayscale(100%);
-            transform: scale(0.85);
+        #board-container {
+            width: 90vw;
+            max-width: 400px; /* Bảng hình vuông */
+            aspect-ratio: 1 / 1;
+            background-color: rgba(255, 255, 255, 0.6);
+            border-radius: 1rem;
+            border: 4px solid #f59e0b;
+            box-shadow: 0 10px 30px rgba(245, 158, 11, 0.3), inset 0 0 20px rgba(0,0,0,0.05);
+            position: relative;
+            overflow: hidden; /* Che các viên gạch rơi từ ngoài vào */
         }
 
+        /* Từng viên gạch (Tile) */
+        .tile {
+            position: absolute;
+            width: 12.5%; /* 8 cột = 100% / 8 = 12.5% */
+            height: 12.5%; /* 8 hàng */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 2.2rem;
+            transition: top 0.3s ease-in-out, left 0.3s ease-in-out;
+            cursor: pointer;
+            filter: drop-shadow(0 4px 4px rgba(0,0,0,0.1));
+            z-index: 10;
+            will-change: top, left, transform;
+        }
+
+        /* Responsive kích thước Emoji */
+        @media (max-width: 380px) {
+            .tile { font-size: 1.8rem; }
+        }
+
+        /* Hiệu ứng khi chạm */
+        .tile.active {
+            transform: scale(1.15);
+            filter: drop-shadow(0 0 10px rgba(245, 158, 11, 0.8));
+            z-index: 20;
+            background-color: rgba(255,255,255,0.5);
+            border-radius: 50%;
+        }
+
+        /* Hiệu ứng Nổ (Pop) khi ăn điểm */
+        @keyframes popOut {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.4) rotate(15deg); opacity: 1; }
+            100% { transform: scale(0) rotate(45deg); opacity: 0; }
+        }
+        
+        .tile-pop {
+            animation: popOut 0.3s ease-out forwards;
+            z-index: 30;
+        }
+
+        /* Chữ nổi hiển thị điểm combo */
+        .floating-score {
+            position: absolute;
+            color: #ef4444; /* Đỏ rực */
+            font-weight: 900;
+            font-size: 2rem;
+            pointer-events: none;
+            z-index: 100;
+            animation: floatUp 1s ease-out forwards;
+            text-shadow: 2px 2px 0 #fff, -2px -2px 0 #fff, 2px -2px 0 #fff, -2px 2px 0 #fff;
+            transform: translate(-50%, -50%);
+        }
+
+        @keyframes floatUp {
+            0% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+            100% { transform: translate(-50%, -150%) scale(1.5); opacity: 0; }
+        }
     </style>
 </head>
 <body>
 
-    <div id="viewport">
-        <div id="map-container"></div>
-    </div>
-
-    <!-- Thanh HUD trên cùng -->
-    <div id="hud-top" class="fixed top-4 left-4 right-4 z-50 flex justify-between pointer-events-none hidden gap-2">
-        <!-- Nút Tắt/Mở Nhạc -->
-        <button id="btnBGM" class="glass-panel px-3 py-2 rounded-2xl shadow-md pointer-events-auto text-xl transition-transform hover:scale-110 active:scale-95" title="Bật/Tắt Nhạc Nền">
-            🔊
-        </button>
-
-        <!-- Level -->
-        <div class="glass-panel px-4 py-2 rounded-2xl shadow-md pointer-events-auto text-center flex-1 max-w-[120px] hidden sm:block">
-            <p class="text-[10px] md:text-xs font-bold text-blue-500 uppercase">Màn Chơi</p>
-            <p class="text-xl md:text-2xl font-black text-gray-800" id="level-display">1</p>
+    <!-- HUD -->
+    <div id="hud-top" class="fixed top-4 left-0 w-full z-50 flex justify-center gap-2 px-4 pointer-events-none hidden">
+        <button id="btnBGM" class="glass-panel px-3 py-2 rounded-2xl pointer-events-auto text-xl active:scale-95" title="Nhạc Nền">🔊</button>
+        
+        <div class="glass-panel px-4 py-2 rounded-2xl text-center flex-1 max-w-[120px]">
+            <p class="text-[10px] font-bold text-blue-500 uppercase">Màn</p>
+            <p class="text-xl font-black text-gray-800" id="level-display">1</p>
         </div>
         
-        <!-- Timer -->
-        <div class="glass-panel px-4 py-2 rounded-2xl shadow-md pointer-events-auto text-center flex-1 max-w-[150px]">
-            <p class="text-[10px] md:text-xs font-bold text-red-500 uppercase">Thời gian</p>
-            <p class="text-xl md:text-2xl font-black text-gray-800 transition-colors duration-300" id="timer">00:00</p>
+        <div class="glass-panel px-4 py-2 rounded-2xl text-center flex-1 max-w-[150px]">
+            <p class="text-[10px] font-bold text-red-500 uppercase">Thời gian</p>
+            <p class="text-xl font-black text-gray-800 transition-colors duration-300" id="timer">00:00</p>
         </div>
         
-        <!-- Progress -->
-        <div class="glass-panel px-4 py-2 rounded-2xl shadow-md pointer-events-auto text-center flex-1 max-w-[150px]">
-            <p class="text-[10px] md:text-xs font-bold text-orange-500 uppercase">Đã tìm thấy</p>
-            <p class="text-xl md:text-2xl font-black text-gray-800"><span id="found-count">0</span>/<span id="total-count">8</span></p>
+        <div class="glass-panel px-4 py-2 rounded-2xl text-center flex-1 max-w-[150px]">
+            <p class="text-[10px] font-bold text-orange-500 uppercase">Điểm Số</p>
+            <p class="text-xl font-black text-gray-800" id="score-display">0</p>
         </div>
     </div>
 
-    <!-- Thanh Checklist dưới cùng -->
-    <div id="checklist" class="glass-panel p-3 hidden">
-        <p class="text-center text-[10px] md:text-xs font-bold text-gray-500 mb-2 uppercase tracking-widest border-b border-gray-200 pb-1">Đặc Sản Cần Tìm</p>
-        <div class="flex justify-start md:justify-center items-center gap-2 pb-2" id="checklist-items">
-            <!-- JS render checklist -->
+    <!-- Thanh Mục tiêu (Target) -->
+    <div id="target-hud" class="fixed bottom-8 left-1/2 transform -translate-x-1/2 z-50 glass-panel px-6 py-3 rounded-full flex gap-4 items-center hidden">
+        <p class="text-xs font-bold text-gray-500 uppercase tracking-widest">Mục tiêu màn này:</p>
+        <p class="text-2xl font-black text-orange-600"><span id="target-score">1000</span> <span class="text-sm text-orange-400">Điểm</span></p>
+    </div>
+
+    <!-- Khu vực Game Board -->
+    <div id="game-area">
+        <!-- Vùng chứa lưới 8x8 -->
+        <div id="board-container" class="hidden">
+            <!-- JS sinh gạch vào đây -->
         </div>
     </div>
 
-    <!-- Màn hình Khởi Đầu -->
-    <div id="startScreen" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-opacity duration-300">
+    <!-- Màn hình Khởi Đầu (ĐÃ ĐƯỢC THIẾT KẾ LẠI) -->
+    <div id="startScreen" class="fixed inset-0 bg-black/60 backdrop-blur-sm z-[100] flex items-center justify-center p-4 transition-opacity duration-300">
         <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-md w-full text-center border-4 border-yellow-400 relative overflow-hidden">
-            <div class="absolute -top-10 -left-10 text-[8rem] opacity-10">🗺️</div>
+            <!-- Họa tiết chìm trang trí -->
+            <div class="absolute -top-10 -left-10 text-[8rem] opacity-10 pointer-events-none">🧩</div>
+            <div class="absolute -bottom-10 -right-10 text-[6rem] opacity-10 pointer-events-none">🍜</div>
             
-            <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-500 to-orange-500 mb-2">Hành Trình Mắt Thần</h1>
-            <p class="text-red-600 font-bold uppercase tracking-widest text-sm mb-6 bg-red-100 inline-block px-4 py-1 rounded-full animate-pulse">Độ Khó: Bậc Thầy</p>
+            <!-- Tiêu đề Game -->
+            <div class="mb-3 inline-block bg-orange-100 text-orange-600 px-4 py-1 rounded-full font-bold text-xs tracking-widest border border-orange-200 uppercase">
+                Mini Game Trí Tuệ
+            </div>
+            <h1 class="text-4xl font-black text-transparent bg-clip-text bg-gradient-to-r from-red-600 to-orange-500 mb-6 leading-tight drop-shadow-sm">
+                TINH HOA<br>VIỆT NAM
+            </h1>
             
-            <div class="bg-gray-50 p-4 rounded-xl text-left mb-6 border border-gray-200">
-                <p class="font-bold text-gray-800 mb-2 text-center border-b pb-2">📜 Thử Thách Cực Độ:</p>
-                <ul class="text-sm text-gray-600 space-y-2 font-semibold">
-                    <li>🎵 <b>Có Nhạc Nền Mới:</b> Giai điệu ngũ cung thư giãn.</li>
-                    <li>🌍 <b>Bản Đồ Khổng Lồ:</b> Rộng hơn gấp nhiều lần, hãy kéo/vuốt mỏi tay!</li>
-                    <li>🌪️ <b>Mọi Thứ Đều Bay:</b> Đồ vật sẽ di chuyển và rung lắc mạnh mẽ khi cấp độ tăng lên. Hãy nhanh tay chộp lấy chúng!</li>
-                    <li>⏳ <b>Đồng Hồ Hỗ Trợ:</b> Nhấp Đồng Hồ ⏳/⏰ để được cộng <span class="text-green-500 font-bold">+2 giây</span>!</li>
-                    <li>🎁 <b>Hộp Quà Nhân Phẩm:</b> Bấm Hộp Quà 🎁 để có cơ hội được tìm đồ giúp. Tuy nhiên cẩn thận vì <b class="text-red-500">60%</b> mở ra sẽ nổ bẫy (Bom, Lốc, Đóng băng)!</li>
-                      <li>🎁 <b>Game được phát hành bởi PN-293</b>Chúc các bạn chơi game vui vẻ không quạu</li>
+            <!-- Khung Thể Lệ Trò Chơi -->
+            <div class="bg-amber-50 p-5 rounded-2xl text-left mb-8 border border-amber-200 shadow-inner relative z-10">
+                <p class="font-black text-amber-900 mb-4 text-center border-b-2 border-amber-200/60 pb-2 text-lg flex items-center justify-center gap-2">
+                    <span>📜</span> THỂ LỆ TRÒ CHƠI
+                </p>
+                <ul class="text-sm text-gray-700 space-y-3 font-semibold">
+                    <li class="flex items-start gap-3">
+                        <span class="text-lg leading-none mt-0.5">👆</span> 
+                        <span><b>Cách chơi:</b> Vuốt hoặc nhấp để đổi chỗ 2 món đặc sản nằm cạnh nhau.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-lg leading-none mt-0.5">💥</span> 
+                        <span><b>Ăn điểm:</b> Xếp 3 món giống nhau trở lên (ngang/dọc) để thu hoạch. VD: 🍜🍜🍜</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-lg leading-none mt-0.5">🔥</span> 
+                        <span><b>Combo:</b> Tạo chuỗi rớt liên hoàn để được nhân <b>x2, x3 điểm</b>!</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <span class="text-lg leading-none mt-0.5">⏱️</span> 
+                        <span><b>Mục tiêu:</b> Đạt đủ Điểm Yêu Cầu trước khi đồng hồ đếm ngược hết giờ.</span>
+                    </li>
                 </ul>
             </div>
 
-            <button id="btnStart" class="w-full bg-gradient-to-r from-red-500 to-orange-500 hover:from-red-600 hover:to-orange-600 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_#991b1b] active:shadow-[0_0px_0_#991b1b] active:translate-y-[6px] transition-all">
-                CHẤP NHẬN THỬ THÁCH 🚀
+            <!-- Nút Bắt Đầu 3D -->
+            <button id="btnStart" class="w-full bg-gradient-to-b from-red-500 to-red-600 hover:from-red-400 hover:to-red-500 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_#991b1b] active:shadow-[0_0px_0_#991b1b] active:translate-y-[6px] transition-all flex justify-center items-center gap-2 relative z-10">
+                <span>VÀO BẾP NGAY</span> <span class="text-2xl">🚀</span>
             </button>
         </div>
     </div>
 
-    <!-- Màn hình Qua Màn (Level Up) -->
+    <!-- Màn hình Qua Màn -->
     <div id="levelWinScreen" class="fixed inset-0 bg-black/60 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full text-center border-4 border-blue-400" id="levelWinModal">
+        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full text-center border-4 border-blue-400">
             <div class="text-6xl mb-4 animate-bounce">🌟</div>
             <h2 class="text-3xl font-black text-blue-500 mb-2">Qua Màn!</h2>
-            <p id="levelWinText" class="text-gray-600 font-bold mb-6">Ủa qua được luôn hả? Chắc do ăn may. Chờ xem màn sau lé mắt luôn!</p>
+            <p class="text-gray-600 font-bold mb-6">Combo quá mượt! Màn sau điểm mục tiêu sẽ cao hơn và thời gian sẽ rút ngắn lại đấy. Chuẩn bị tinh thần nhé!</p>
             
             <button id="btnNextLevel" class="w-full bg-blue-500 hover:bg-blue-600 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_#1e3a8a] active:shadow-[0_0px_0_#1e3a8a] active:translate-y-[6px] transition-all">
-                ĐI TỚI MÀN TIẾP THEO ➡️
+                TIẾN VÀO MÀN TIẾP ➡️
             </button>
         </div>
     </div>
 
-    <!-- Màn hình Thua (Game Over) -->
+    <!-- Màn hình Thua -->
     <div id="loseScreen" class="fixed inset-0 bg-red-900/80 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-300">
-        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full text-center border-4 border-red-500" id="loseModal">
+        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-sm w-full text-center border-4 border-red-500">
             <div class="text-6xl mb-4">⏰</div>
             <h2 class="text-4xl font-black text-red-600 mb-2">Hết Giờ!</h2>
-            <p id="loseText" class="text-gray-600 font-bold mb-6">Có nhiêu đó cũng tìm không ra! Đem mắt đi khám lẹ lên bạn ơi!</p>
+            <p class="text-gray-600 font-bold mb-6">Bạn chưa đạt đủ điểm mục tiêu. Đừng để lỡ những combo lớn nhé, thử lại nào!</p>
             
             <button id="btnRestart" class="w-full bg-orange-500 hover:bg-orange-600 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_#9a3412] active:shadow-[0_0px_0_#9a3412] active:translate-y-[6px] transition-all">
                 CHƠI LẠI TỪ MÀN 1 🔄
@@ -285,15 +222,15 @@
         </div>
     </div>
 
-    <!-- Màn hình Phá Đảo (Game Complete) -->
+    <!-- Màn hình Phá Đảo -->
     <div id="winScreen" class="fixed inset-0 bg-black/70 backdrop-blur-md z-[100] hidden flex items-center justify-center p-4 opacity-0 transition-opacity duration-500">
-        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-md w-full text-center border-4 border-green-400" id="winModal">
+        <div class="bg-white p-8 rounded-[2rem] shadow-2xl max-w-md w-full text-center border-4 border-green-400">
             <div class="text-7xl mb-4 drop-shadow-lg">🏆</div>
             <h2 class="text-4xl font-black text-green-500 mb-2">PHÁ ĐẢO! 🎉</h2>
-            <p class="text-gray-600 font-bold mb-6">Đỉnh đấy, chắc cày mòn cả màn hình rồi chứ gì? Xứng đáng nhận cúp 'Mắt Cú Vọ'!</p>
+            <p class="text-gray-600 font-bold mb-6">Bậc Thầy Xếp Hình! Những pha nổ Combo của bạn đã chinh phục toàn bộ các mức độ khó nhất!</p>
             
             <div class="bg-yellow-50 p-4 rounded-xl mb-6 border border-yellow-200">
-                <p class="text-sm font-black text-yellow-800">DANH HIỆU: ĐÔI MẮT THẦN ĐIÊU CẤP ĐỘ VŨ TRỤ</p>
+                <p class="text-sm font-black text-yellow-800">TỔNG ĐIỂM CỦA BẠN: <span id="final-score-text" class="text-2xl text-red-500">0</span></p>
             </div>
 
             <button onclick="location.reload()" class="w-full bg-green-500 hover:bg-green-600 text-white font-black text-xl py-4 rounded-2xl shadow-[0_6px_0_#14532d] active:shadow-[0_0px_0_#14532d] active:translate-y-[6px] transition-all">
@@ -304,60 +241,37 @@
 
     <!-- JavaScript Game Logic -->
     <script>
-        // --- HỆ THỐNG ÂM THANH & BGM ---
+        // --- HỆ THỐNG ÂM THANH (Pentatonic Synthesizer) ---
         const AudioContext = window.AudioContext || window.webkitAudioContext;
         let audioCtx;
         let bgmInterval;
         let isBgmMuted = false;
-        const PENTATONIC = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25]; // Âm giai ngũ cung
-
-        // Các câu chế giễu hài hước
-        const LEVEL_WIN_QUOTES = [
-            "Hên thôi chứ hay ho gì! Màn sau cho khóc thét nè.",
-            "Ủa qua được luôn hả? Chắc do ăn may. Chờ xem màn sau lé mắt luôn!",
-            "Cũng tạm đấy, nhưng mắt bạn sắp mờ rồi đúng không? Cố lên nha!",
-            "Mới qua được có xíu mà làm như giỏi lắm. Map sau bão táp ráng mà chịu!"
-        ];
-        
-        const LOSE_QUOTES = [
-            "Có nhiêu đó cũng tìm không ra! Đem con mắt đi khám lẹ lên bạn ơi!",
-            "Nói chậm tay mờ mắt lại tự ái. Chơi lại từ đầu cho chừa nha!",
-            "Ủa alo? Đang ngủ gật hay gì mà để hết giờ vậy?",
-            "Kém quá! Gà mờ thế này thì về nhà ngủ sớm đi chứ chơi bời gì!"
-        ];
+        const PENTATONIC = [261.63, 293.66, 329.63, 392.00, 440.00, 523.25, 587.33, 659.25, 783.99, 880.00];
 
         function initAudio() {
             if (!audioCtx) audioCtx = new AudioContext();
             if (audioCtx.state === 'suspended') audioCtx.resume();
         }
 
-        // Tạo nhạc nền xung quanh (Ambient)
         function startBGM() {
             if (!audioCtx) initAudio();
             if (bgmInterval) clearInterval(bgmInterval);
-            
             bgmInterval = setInterval(() => {
                 if (isBgmMuted || !isPlaying) return;
-                
                 const now = audioCtx.currentTime;
                 const osc = audioCtx.createOscillator();
                 const gain = audioCtx.createGain();
-                
                 osc.type = 'sine';
                 osc.connect(gain);
                 gain.connect(audioCtx.destination);
-                
-                const freq = PENTATONIC[Math.floor(Math.random() * PENTATONIC.length)];
+                const freq = PENTATONIC[Math.floor(Math.random() * 5)]; // Lấy các nốt trầm
                 osc.frequency.setValueAtTime(freq, now);
-                
-                // Attack / Decay êm ái
                 gain.gain.setValueAtTime(0, now);
-                gain.gain.linearRampToValueAtTime(0.03, now + 0.1); // Âm lượng siêu nhỏ để làm nền
+                gain.gain.linearRampToValueAtTime(0.02, now + 0.1); 
                 gain.gain.exponentialRampToValueAtTime(0.001, now + 1.5);
-                
                 osc.start(now);
                 osc.stop(now + 1.5);
-            }, 600); // Mỗi 0.6 giây đánh 1 nốt ngẫu nhiên
+            }, 800);
         }
 
         function toggleBGM() {
@@ -366,22 +280,45 @@
         }
         document.getElementById('btnBGM').addEventListener('click', toggleBGM);
 
-        // Hiệu ứng âm thanh khi chơi
-        function playSound(type) {
-            if (!audioCtx) return;
+        // Hiệu ứng âm thanh tương tác
+        function playSound(type, comboMultiplier = 1) {
+            if (!audioCtx || isBgmMuted) return;
             const now = audioCtx.currentTime;
             const osc = audioCtx.createOscillator();
             const gain = audioCtx.createGain();
             osc.connect(gain);
             gain.connect(audioCtx.destination);
 
-            if (type === 'found') {
+            if (type === 'swap') {
                 osc.type = 'sine';
-                osc.frequency.setValueAtTime(880, now);
-                osc.frequency.exponentialRampToValueAtTime(1760, now + 0.1);
-                gain.gain.setValueAtTime(0.3, now); // Âm lượng to hơn BGM
-                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.3);
-                osc.start(now); osc.stop(now + 0.3);
+                osc.frequency.setValueAtTime(300, now);
+                osc.frequency.exponentialRampToValueAtTime(400, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
+            } else if (type === 'match') {
+                // Combo càng cao, nốt nhạc càng cao (vui tai hơn)
+                let noteIndex = Math.min(comboMultiplier + 3, PENTATONIC.length - 1);
+                osc.type = 'triangle';
+                osc.frequency.setValueAtTime(PENTATONIC[noteIndex], now);
+                gain.gain.setValueAtTime(0.2, now);
+                gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+                
+                // Tiếng nổ lấp lánh (hòa âm)
+                const osc2 = audioCtx.createOscillator();
+                osc2.type = 'sine';
+                osc2.frequency.setValueAtTime(PENTATONIC[Math.min(noteIndex + 2, PENTATONIC.length - 1)], now);
+                osc2.connect(gain);
+                osc2.start(now); osc2.stop(now + 0.2);
+                
+                osc.start(now); osc.stop(now + 0.2);
+            } else if (type === 'error') {
+                osc.type = 'sawtooth';
+                osc.frequency.setValueAtTime(150, now);
+                osc.frequency.linearRampToValueAtTime(100, now + 0.1);
+                gain.gain.setValueAtTime(0.1, now);
+                gain.gain.linearRampToValueAtTime(0, now + 0.1);
+                osc.start(now); osc.stop(now + 0.1);
             } else if (type === 'win') {
                 [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => { 
                     const o = audioCtx.createOscillator();
@@ -400,401 +337,386 @@
                 gain.gain.setValueAtTime(0.3, now);
                 gain.gain.linearRampToValueAtTime(0, now + 0.6);
                 osc.start(now); osc.stop(now + 0.6);
-            } else if (type === 'powerup') {
-                osc.type = 'sine';
-                osc.frequency.setValueAtTime(440, now);
-                osc.frequency.linearRampToValueAtTime(880, now + 0.1);
-                osc.frequency.linearRampToValueAtTime(1320, now + 0.2);
-                gain.gain.setValueAtTime(0.3, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.3);
-                osc.start(now); osc.stop(now + 0.3);
-            } else if (type === 'trap_bomb') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(100, now);
-                osc.frequency.exponentialRampToValueAtTime(10, now + 0.5);
-                gain.gain.setValueAtTime(0.5, now);
-                gain.gain.linearRampToValueAtTime(0, now + 0.5);
-                osc.start(now); osc.stop(now + 0.5);
-            } else if (type === 'trap_freeze') {
-                osc.type = 'square';
-                osc.frequency.setValueAtTime(1200, now);
-                osc.frequency.linearRampToValueAtTime(800, now + 0.2);
-                gain.gain.setValueAtTime(0.1, now);
-                gain.gain.linearRampToValueAtTime(0, now + 1.5);
-                osc.start(now); osc.stop(now + 1.5);
-            } else if (type === 'trap_tornado') {
-                osc.type = 'sawtooth';
-                osc.frequency.setValueAtTime(50, now);
-                osc.frequency.linearRampToValueAtTime(300, now + 0.5);
-                osc.frequency.linearRampToValueAtTime(50, now + 1);
-                gain.gain.setValueAtTime(0.4, now);
-                gain.gain.linearRampToValueAtTime(0, now + 1);
-                osc.start(now); osc.stop(now + 1);
             }
         }
 
-        // --- CẤU HÌNH CÁC MÀN CHƠI ---
-        const LEVELS = [
-            { targets: 6, time: 45, mapW: 3000, mapH: 2000, decos: 300 },   // Màn 1: Khởi động
-            { targets: 10, time: 40, mapW: 4500, mapH: 3000, decos: 600 },  // Màn 2: Map rộng
-            { targets: 14, time: 35, mapW: 6000, mapH: 4000, decos: 1000 }, // Màn 3: Áp lực thời gian
-            { targets: 16, time: 30, mapW: 8000, mapH: 5000, decos: 1500 }  // Màn 4: Map khổng lồ, mù mắt
-        ];
-
-        // 16 Vật phẩm mục tiêu
-        const ALL_TARGETS = [
-            { id: 'pho', emoji: '🍜' }, { id: 'coffee', emoji: '☕' },
-            { id: 'banhmi', emoji: '🥖' }, { id: 'lantern', emoji: '🏮' },
-            { id: 'hat', emoji: '👒' }, { id: 'scooter', emoji: '🛵' },
-            { id: 'lotus', emoji: '🪷' }, { id: 'boat', emoji: '🛶' },
-            { id: 'dumpling', emoji: '🥟' }, { id: 'bicycle', emoji: '🚲' },
-            { id: 'coconut', emoji: '🥥' }, { id: 'watermelon', emoji: '🍉' },
-            { id: 'starfruit', emoji: '🍍' }, { id: 'crab', emoji: '🦀' },
-            { id: 'temple', emoji: '⛩️' }, { id: 'buffalo', emoji: '🐃' }
-        ];
-
-        const DECORATIONS = ['🌳', '🌲', '☁️', '🏘️', '🌾', '⛰️', '🌴', '🌸', '🪵', '🍄', '🌿', '🌻'];
-        const BOOSTERS = ['⏳', '⏰', '🎁'];
-        const TRAPS = ['💣', '🧊', '🌪️'];
-
-        // State variables
-        let currentLevelIndex = 0;
-        let MAP_WIDTH = 0;
-        let MAP_HEIGHT = 0;
+        // --- CẤU HÌNH TRÒ CHƠI (MATCH-3) ---
+        const ROWS = 8;
+        const COLS = 8;
+        const EMOJIS = ['🍜', '☕', '🥖', '🏮', '👒', '🪷'];
         
+        const LEVELS = [
+            { time: 60, target: 1500 }, // Màn 1: Dễ làm quen
+            { time: 50, target: 3000 }, // Màn 2
+            { time: 45, target: 5000 }, // Màn 3
+            { time: 40, target: 8000 }  // Màn 4: Rất khó
+        ];
+
+        let grid = []; // Mảng 2D quản lý logic: grid[row][col] = { id, type, el }
+        let currentLevelIndex = 0;
         let isPlaying = false;
-        let foundCount = 0;
+        let isAnimating = false; // Cờ chặn thao tác khi gạch đang rớt/nổ
+        let score = 0;
         let timeRemaining = 0;
         let timerInterval;
-        let activeTargets = [];
-        let mapEntities = []; // Quản lý vật thể chuyển động
-        let rAF_ID = null;    // ID cho vòng lặp Animation
+        let tileIdCounter = 0;
 
-        // Vòng lặp Animation (Di chuyển các đồ vật)
-        function animateMap() {
+        // Selection / Swipe state
+        let selectedTile = null;
+        let swipeStartX, swipeStartY;
+
+        // DOM
+        const boardContainer = document.getElementById('board-container');
+        const scoreDisplay = document.getElementById('score-display');
+        const timerDisplay = document.getElementById('timer');
+        const targetDisplay = document.getElementById('target-score');
+
+        // Utils
+        const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
+
+        // --- LOGIC TẠO BẢNG ---
+        function createBoard() {
+            boardContainer.innerHTML = '';
+            grid = [];
+            tileIdCounter = 0;
+
+            for (let r = 0; r < ROWS; r++) {
+                grid[r] = [];
+                for (let c = 0; c < COLS; c++) {
+                    let type;
+                    // Đảm bảo không có hàng 3 lúc mới sinh ra
+                    do {
+                        type = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+                    } while (
+                        (c >= 2 && grid[r][c-1].type === type && grid[r][c-2].type === type) ||
+                        (r >= 2 && grid[r-1][c].type === type && grid[r-2][c].type === type)
+                    );
+
+                    const tileObj = createTileDOM(r, c, type);
+                    grid[r][c] = tileObj;
+                }
+            }
+        }
+
+        function createTileDOM(r, c, type) {
+            const el = document.createElement('div');
+            el.className = 'tile';
+            el.innerText = type;
+            
+            // Tính toán vị trí % (Top, Left)
+            el.style.top = `${r * 12.5}%`;
+            el.style.left = `${c * 12.5}%`;
+
+            const tileObj = { id: tileIdCounter++, type: type, r: r, c: c, el: el };
+            
+            // Xử lý sự kiện bằng Pointer Events
+            el.addEventListener('pointerdown', (e) => handlePointerDown(e, tileObj));
+            
+            boardContainer.appendChild(el);
+            return tileObj;
+        }
+
+        // Cập nhật tọa độ CSS cho toàn bộ gạch dựa trên mảng grid logic
+        function updateDOMPositions() {
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS; c++) {
+                    let tile = grid[r][c];
+                    if (tile && tile.el) {
+                        tile.r = r;
+                        tile.c = c;
+                        tile.el.style.top = `${r * 12.5}%`;
+                        tile.el.style.left = `${c * 12.5}%`;
+                    }
+                }
+            }
+        }
+
+        // --- ĐIỀU KHIỂN (SWIPE / CLICK) ---
+        function handlePointerDown(e, tileObj) {
+            if (!isPlaying || isAnimating) return;
+            e.preventDefault();
+
+            swipeStartX = e.clientX;
+            swipeStartY = e.clientY;
+
+            if (!selectedTile) {
+                // Click lần đầu
+                selectedTile = tileObj;
+                tileObj.el.classList.add('active');
+            } else {
+                // Click lần hai vào ô khác
+                const prevSelected = selectedTile;
+                selectedTile.el.classList.remove('active');
+                selectedTile = null;
+
+                if (isAdjacent(prevSelected, tileObj)) {
+                    attemptSwap(prevSelected, tileObj);
+                } else if (prevSelected !== tileObj) {
+                    // Click ô xa -> chuyển vùng chọn
+                    selectedTile = tileObj;
+                    tileObj.el.classList.add('active');
+                }
+            }
+
+            // Theo dõi vuốt (Swipe) nếu bấm giữ rồi rê
+            document.addEventListener('pointerup', handlePointerUp, { once: true });
+        }
+
+        function handlePointerUp(e) {
+            if (!isPlaying || isAnimating || !selectedTile) return;
+
+            const dx = e.clientX - swipeStartX;
+            const dy = e.clientY - swipeStartY;
+            const threshold = 30; // Vuốt hơn 30px thì tính là vuốt
+
+            if (Math.abs(dx) > threshold || Math.abs(dy) > threshold) {
+                // Determine swipe direction
+                let targetR = selectedTile.r;
+                let targetC = selectedTile.c;
+
+                if (Math.abs(dx) > Math.abs(dy)) {
+                    targetC += (dx > 0) ? 1 : -1; // Phải hoặc Trái
+                } else {
+                    targetR += (dy > 0) ? 1 : -1; // Dưới hoặc Trên
+                }
+
+                // Kiểm tra có bị out map không
+                if (targetR >= 0 && targetR < ROWS && targetC >= 0 && targetC < COLS) {
+                    const targetTile = grid[targetR][targetC];
+                    const prevSelected = selectedTile;
+                    selectedTile.el.classList.remove('active');
+                    selectedTile = null;
+                    attemptSwap(prevSelected, targetTile);
+                } else {
+                    selectedTile.el.classList.remove('active');
+                    selectedTile = null;
+                }
+            }
+        }
+
+        function isAdjacent(t1, t2) {
+            const dr = Math.abs(t1.r - t2.r);
+            const dc = Math.abs(t1.c - t2.c);
+            return (dr === 1 && dc === 0) || (dr === 0 && dc === 1);
+        }
+
+        // --- LÕI GAME (MATCH-3 LOGIC) ---
+        async function attemptSwap(t1, t2) {
+            isAnimating = true;
+            playSound('swap');
+
+            // Hoán đổi trong mảng Logic
+            grid[t1.r][t1.c] = t2;
+            grid[t2.r][t2.c] = t1;
+            
+            // Cập nhật DOM để xem hiệu ứng di chuyển
+            updateDOMPositions();
+            await sleep(300); // Chờ css transition hoàn tất
+
+            // Tìm xem có tạo thành match không
+            const matches = findMatches();
+            
+            if (matches.length > 0) {
+                // Có match -> Xử lý nổ -> rớt gạch
+                await processMatches(matches, 1);
+            } else {
+                // Không match -> Hoán đổi ngược lại (Lỗi)
+                playSound('error');
+                grid[t1.r][t1.c] = t2; // Trả về cũ
+                grid[t2.r][t2.c] = t1;
+                updateDOMPositions();
+                await sleep(300);
+            }
+
+            isAnimating = false;
+        }
+
+        // Hàm tìm tất cả các chuỗi >= 3
+        function findMatches() {
+            let matchedSet = new Set(); // Dùng Set để tránh trùng lặp viên gạch (góc chữ L)
+
+            // Duyệt hàng ngang
+            for (let r = 0; r < ROWS; r++) {
+                for (let c = 0; c < COLS - 2; c++) {
+                    let t1 = grid[r][c], t2 = grid[r][c+1], t3 = grid[r][c+2];
+                    if (t1 && t2 && t3 && t1.type === t2.type && t2.type === t3.type) {
+                        matchedSet.add(t1); matchedSet.add(t2); matchedSet.add(t3);
+                        // Kéo dài ra nếu có 4, 5
+                        let nextC = c + 3;
+                        while (nextC < COLS && grid[r][nextC] && grid[r][nextC].type === t1.type) {
+                            matchedSet.add(grid[r][nextC]);
+                            nextC++;
+                        }
+                    }
+                }
+            }
+
+            // Duyệt hàng dọc
+            for (let c = 0; c < COLS; c++) {
+                for (let r = 0; r < ROWS - 2; r++) {
+                    let t1 = grid[r][c], t2 = grid[r+1][c], t3 = grid[r+2][c];
+                    if (t1 && t2 && t3 && t1.type === t2.type && t2.type === t3.type) {
+                        matchedSet.add(t1); matchedSet.add(t2); matchedSet.add(t3);
+                        let nextR = r + 3;
+                        while (nextR < ROWS && grid[nextR][c] && grid[nextR][c].type === t1.type) {
+                            matchedSet.add(grid[nextR][c]);
+                            nextR++;
+                        }
+                    }
+                }
+            }
+
+            return Array.from(matchedSet);
+        }
+
+        // Hàm đệ quy xử lý: Nổ -> Rớt -> Điền đầy -> Check lại
+        async function processMatches(matches, comboMultiplier) {
             if (!isPlaying) return;
-            mapEntities.forEach(e => {
-                e.x += e.vx;
-                e.y += e.vy;
-                
-                // Đập vào tường thì dội lại
-                if (e.x <= 50 || e.x >= MAP_WIDTH - 50) e.vx *= -1;
-                if (e.y <= 50 || e.y >= MAP_HEIGHT - 50) e.vy *= -1;
-                
-                e.el.style.transform = `translate(${e.x}px, ${e.y}px)`;
+
+            playSound('match', comboMultiplier);
+
+            // Tính điểm: Cơ bản mỗi viên 10đ. Được nhân hệ số Combo
+            const points = matches.length * 10 * comboMultiplier;
+            score += points;
+            scoreDisplay.innerText = score;
+
+            // Hiệu ứng chữ nổi (lấy tọa độ viên đầu tiên làm trung tâm)
+            if (matches.length > 0) {
+                const centerTile = matches[Math.floor(matches.length / 2)];
+                showFloatingScore(centerTile.r, centerTile.c, `+${points}${comboMultiplier > 1 ? ` (x${comboMultiplier})` : ''}`);
+            }
+
+            // 1. Phá hủy DOM và xóa khỏi logic
+            matches.forEach(tile => {
+                tile.el.classList.add('tile-pop');
+                grid[tile.r][tile.c] = null; // Trống ô
+                setTimeout(() => { if (tile.el.parentNode) tile.el.remove(); }, 300);
             });
-            rAF_ID = requestAnimationFrame(animateMap);
-        }
 
-        // DOM Elements
-        const mapContainer = document.getElementById('map-container');
-        const viewport = document.getElementById('viewport');
-        const hudTop = document.getElementById('hud-top');
-        const checklistUI = document.getElementById('checklist');
-        const checklistItemsDiv = document.getElementById('checklist-items');
-        
-        // --- LOGIC SINH BẢN ĐỒ ---
-        function generateMap() {
-            const levelConfig = LEVELS[currentLevelIndex];
-            MAP_WIDTH = levelConfig.mapW;
-            MAP_HEIGHT = levelConfig.mapH;
-            
-            mapContainer.style.width = `${MAP_WIDTH}px`;
-            mapContainer.style.height = `${MAP_HEIGHT}px`;
-            mapContainer.innerHTML = ''; 
-            activeTargets = [];
-            mapEntities = []; // Reset danh sách vật thể
+            await sleep(350);
 
-            // 1. Rải vật thể nhiễu
-            for (let i = 0; i < levelConfig.decos; i++) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'map-wrapper';
-
-                const deco = document.createElement('div');
-                const shakeClass = currentLevelIndex > 0 ? `shake-${currentLevelIndex}` : 'shake-0';
-                deco.className = `map-item deco-item ${shakeClass}`;
-                deco.innerText = DECORATIONS[Math.floor(Math.random() * DECORATIONS.length)];
+            // 2. Rớt gạch (Gravity)
+            for (let c = 0; c < COLS; c++) {
+                let emptySpaces = 0;
+                // Duyệt từ dưới lên
+                for (let r = ROWS - 1; r >= 0; r--) {
+                    if (grid[r][c] === null) {
+                        emptySpaces++;
+                    } else if (emptySpaces > 0) {
+                        // Kéo viên gạch hiện tại xuống ô trống
+                        let tile = grid[r][c];
+                        grid[r + emptySpaces][c] = tile;
+                        grid[r][c] = null;
+                    }
+                }
                 
-                const x = 50 + Math.random() * (MAP_WIDTH - 100);
-                const y = 50 + Math.random() * (MAP_HEIGHT - 100);
-                wrapper.style.transform = `translate(${x}px, ${y}px)`;
-                
-                const scale = currentLevelIndex >= 2 ? (0.5 + Math.random()*0.5) : (0.7 + Math.random()*0.6);
-                deco.style.setProperty('--rot', `${(Math.random()-0.5)*30}deg`);
-                deco.style.setProperty('--scl', scale);
-                
-                wrapper.appendChild(deco);
-                mapContainer.appendChild(wrapper);
-
-                // Thêm vận tốc nếu màn > 0
-                const speed = currentLevelIndex > 0 ? (currentLevelIndex * 1.5 + Math.random() * 2) : 0;
-                if (speed > 0) {
-                    const angle = Math.random() * Math.PI * 2;
-                    mapEntities.push({
-                        el: wrapper, x: x, y: y,
-                        vx: Math.cos(angle) * speed,
-                        vy: Math.sin(angle) * speed
-                    });
+                // 3. Điền gạch mới vào chỗ trống ở trên cùng
+                for (let r = 0; r < emptySpaces; r++) {
+                    const type = EMOJIS[Math.floor(Math.random() * EMOJIS.length)];
+                    const newTile = createTileDOM(-1 - r, c, type); // Bắt đầu ở tọa độ âm để rơi xuống
+                    grid[r][c] = newTile;
                 }
             }
 
-            // 2. Lấy ngẫu nhiên N vật phẩm cần tìm
-            const shuffledTargets = [...ALL_TARGETS].sort(() => 0.5 - Math.random());
-            const selectedTargets = shuffledTargets.slice(0, levelConfig.targets);
+            // Cập nhật lại UI cho mượt
+            updateDOMPositions();
+            await sleep(350); // Chờ gạch rơi xong
 
-            // 3. Rải Mục tiêu lên bản đồ
-            selectedTargets.forEach(target => {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'map-wrapper';
-
-                const el = document.createElement('div');
-                const shakeClass = currentLevelIndex > 0 ? `shake-${currentLevelIndex}` : 'shake-0';
-                el.className = `map-item target-item ${shakeClass}`;
-                el.innerText = target.emoji;
-
-                const x = 100 + Math.random() * (MAP_WIDTH - 200);
-                const y = 100 + Math.random() * (MAP_HEIGHT - 200);
-                wrapper.style.transform = `translate(${x}px, ${y}px)`;
-                
-                el.style.setProperty('--rot', '0deg');
-                el.style.setProperty('--scl', '1');
-
-                // DÙNG LẠI EVENT GỐC NHƯ BẠN YÊU CẦU
-                el.addEventListener('click', () => handleFindTarget(target.id, wrapper, el));
-                el.addEventListener('touchstart', (e) => { e.preventDefault(); handleFindTarget(target.id, wrapper, el); });
-
-                wrapper.appendChild(el);
-                mapContainer.appendChild(wrapper);
-                activeTargets.push({ ...target, found: false, wrapper: wrapper, inner: el });
-
-                // Mục tiêu bay nhanh hơn vật nhiễu một chút
-                const speed = currentLevelIndex > 0 ? (currentLevelIndex * 2 + Math.random() * 3) : 0;
-                if (speed > 0) {
-                    const angle = Math.random() * Math.PI * 2;
-                    mapEntities.push({
-                        el: wrapper, x: x, y: y,
-                        vx: Math.cos(angle) * speed,
-                        vy: Math.sin(angle) * speed,
-                        id: target.id
-                    });
-                }
-            });
-
-            // 4. Rải Boosters (Vật phẩm cộng thời gian)
-            // Lượng booster sẽ tăng dần theo màn
-            const boosterAmount = currentLevelIndex + 3;
-            for (let i = 0; i < boosterAmount; i++) {
-                const wrapper = document.createElement('div');
-                wrapper.className = 'map-wrapper';
-
-                const boosterType = BOOSTERS[Math.floor(Math.random() * BOOSTERS.length)];
-                const el = document.createElement('div');
-                const shakeClass = currentLevelIndex > 0 ? `shake-${currentLevelIndex}` : 'shake-0';
-                el.className = `map-item powerup-item ${shakeClass}`;
-                el.innerText = boosterType;
-
-                const x = 100 + Math.random() * (MAP_WIDTH - 200);
-                const y = 100 + Math.random() * (MAP_HEIGHT - 200);
-                wrapper.style.transform = `translate(${x}px, ${y}px)`;
-                
-                el.style.setProperty('--rot', '0deg');
-                el.style.setProperty('--scl', '1');
-
-                el.addEventListener('click', (e) => { e.stopPropagation(); handleFindBooster(wrapper, el, boosterType); });
-                el.addEventListener('touchstart', (e) => { e.preventDefault(); e.stopPropagation(); handleFindBooster(wrapper, el, boosterType); });
-
-                wrapper.appendChild(el);
-                mapContainer.appendChild(wrapper);
-
-                // Booster bay nhanh hơn một chút để người chơi phải đuổi theo
-                const speed = currentLevelIndex > 0 ? (currentLevelIndex * 2.5 + Math.random() * 3) : 1.5;
-                const angle = Math.random() * Math.PI * 2;
-                mapEntities.push({
-                    el: wrapper, x: x, y: y,
-                    vx: Math.cos(angle) * speed,
-                    vy: Math.sin(angle) * speed,
-                    isBooster: true
-                });
+            // 4. Đệ quy: Kiểm tra xem gạch rơi xuống có tạo Combo mới không
+            const newMatches = findMatches();
+            if (newMatches.length > 0) {
+                await processMatches(newMatches, comboMultiplier + 1); // Tăng hệ số Combo
+            } else {
+                // Xong chuỗi nổ. Kiểm tra mục tiêu qua màn
+                checkWinCondition();
             }
-
-            // 5. Khởi tạo Checklist
-            checklistItemsDiv.innerHTML = '';
-            selectedTargets.forEach(target => {
-                checklistItemsDiv.innerHTML += `
-                    <div id="check-${target.id}" class="check-item flex flex-col items-center bg-white p-2 md:p-3 rounded-xl shadow-sm border-2 border-gray-100 min-w-[45px] md:min-w-[60px]">
-                        <span class="text-xl md:text-3xl drop-shadow-sm">${target.emoji}</span>
-                    </div>
-                `;
-            });
-            
-            // Cập nhật HUD
-            document.getElementById('total-count').innerText = levelConfig.targets;
-            document.getElementById('level-display').innerText = currentLevelIndex + 1;
-            timeRemaining = levelConfig.time;
-            updateTimerDisplay();
         }
 
-        // --- CÁC HÀM ĐIỀU KHIỂN GAME ---
+        // Chữ nổi điểm số
+        function showFloatingScore(row, col, text) {
+            const floatText = document.createElement('div');
+            floatText.className = 'floating-score';
+            floatText.innerText = text;
+            
+            // Tính toán tọa độ pixel từ Row/Col (Dựa trên kích thước Container)
+            const rect = boardContainer.getBoundingClientRect();
+            const tileW = rect.width / 8;
+            const tileH = rect.height / 8;
+            
+            floatText.style.left = `${(col * tileW) + (tileW / 2)}px`;
+            floatText.style.top = `${(row * tileH)}px`;
+            
+            boardContainer.appendChild(floatText);
+            setTimeout(() => floatText.remove(), 1000);
+        }
+
+        // --- QUẢN LÝ TIẾN TRÌNH GAME ---
         function startGame() {
             initAudio();
-            startBGM(); // Khởi động BGM
+            startBGM();
             currentLevelIndex = 0;
+            score = 0;
             startLevel();
-            document.getElementById('startScreen').classList.add('opacity-0', 'pointer-events-none');
         }
 
         function startLevel() {
-            generateMap();
+            const config = LEVELS[currentLevelIndex];
+            timeRemaining = config.time;
             
-            foundCount = 0;
-            isPlaying = true;
-            document.getElementById('found-count').innerText = foundCount;
-            
-            // Xóa cảnh báo đỏ nếu có
+            scoreDisplay.innerText = score;
+            document.getElementById('level-display').innerText = currentLevelIndex + 1;
+            targetDisplay.innerText = config.target;
             document.getElementById('timer').classList.remove('text-red-600', 'animate-pulse');
+            updateTimerDisplay();
 
-            // Căn giữa bản đồ
-            posX = -(MAP_WIDTH - window.innerWidth) / 2;
-            posY = -(MAP_HEIGHT - window.innerHeight) / 2;
-            updateMapPosition();
+            createBoard();
+            
+            isPlaying = true;
+            isAnimating = false;
 
-            // Khởi động chuyển động các đồ vật
-            if (rAF_ID) cancelAnimationFrame(rAF_ID);
-            animateMap();
-
-            // Hiện UI
-            hudTop.classList.remove('hidden');
-            checklistUI.classList.remove('hidden');
             hideAllScreens();
+            document.getElementById('hud-top').classList.remove('hidden');
+            document.getElementById('target-hud').classList.remove('hidden');
+            document.getElementById('board-container').classList.remove('hidden');
 
             clearInterval(timerInterval);
             timerInterval = setInterval(() => {
+                if (!isPlaying) return;
                 timeRemaining--;
                 updateTimerDisplay();
 
                 if (timeRemaining <= 10 && timeRemaining > 0) {
                     document.getElementById('timer').classList.add('text-red-600', 'animate-pulse');
                 }
-
+                
                 if (timeRemaining <= 0) {
-                    gameOver();
+                    // Nếu hết giờ mà chưa đủ điểm
+                    if (score < LEVELS[currentLevelIndex].target) {
+                        gameOver();
+                    } else {
+                        checkWinCondition(); // Dự phòng
+                    }
                 }
             }, 1000);
         }
 
-        function handleFindTarget(id, wrapper, inner) {
+        function checkWinCondition() {
             if (!isPlaying) return;
+            const config = LEVELS[currentLevelIndex];
             
-            const target = activeTargets.find(t => t.id === id);
-            if (target && !target.found) {
-                target.found = true;
-                foundCount++;
-                playSound('found');
-
-                inner.classList.add('found-anim');
-                // Loại vật thể ra khỏi vòng lặp chuyển động để nó đứng yên khi bay màu
-                mapEntities = mapEntities.filter(e => e.el !== wrapper); 
-                setTimeout(() => wrapper.remove(), 500);
-
-                document.getElementById(`check-${id}`).classList.add('found', 'bg-gray-200');
-                document.getElementById('found-count').innerText = foundCount;
-
-                // Win Condition for Current Level
-                if (foundCount === LEVELS[currentLevelIndex].targets) {
-                    levelComplete();
-                }
-            }
-        }
-
-        // Xử lý Vật phẩm hỗ trợ & Bẫy Ẩn
-        function handleFindBooster(wrapper, inner, type) {
-            if (!isPlaying) return;
-            
-            const entityIndex = mapEntities.findIndex(e => e.el === wrapper);
-            let posX = 0, posY = 0;
-            
-            if (entityIndex > -1) {
-                const entity = mapEntities[entityIndex];
-                posX = entity.x;
-                posY = entity.y;
-                mapEntities.splice(entityIndex, 1); // Rút khỏi vòng lặp bay
-            }
-            
-            const floatText = document.createElement('div');
-            floatText.style.left = `${posX}px`;
-            floatText.style.top = `${posY}px`;
-
-            if (type === '⏳' || type === '⏰') {
-                playSound('powerup');
-                timeRemaining += 2; // CHỈ CÒN CỘNG 2 GIÂY
-                updateTimerDisplay();
+            // Chỉ qua màn khi đã đạt mục tiêu điểm VÀ chuỗi hiệu ứng (nổ/rớt gạch) đã dừng
+            if (score >= config.target && !isAnimating) {
+                isPlaying = false;
+                clearInterval(timerInterval);
+                playSound('win');
                 
-                floatText.className = 'float-text';
-                floatText.innerText = '+2s';
-                
-                const timerEl = document.getElementById('timer');
-                timerEl.classList.remove('text-red-600', 'animate-pulse');
-                timerEl.style.color = '#10b981';
-                timerEl.style.transform = 'scale(1.2)';
-                setTimeout(() => {
-                    timerEl.style.color = '';
-                    timerEl.style.transform = '';
-                }, 500);
-            } else if (type === '🎁') {
-                // CHƠI HỆ NHÂN PHẨM: 40% Tốt, 60% Dính Bẫy
-                const isLucky = Math.random() < 0.4;
-                
-                if (isLucky) {
-                    playSound('powerup');
-                    floatText.className = 'float-text';
-                    const unfound = activeTargets.filter(t => !t.found);
-                    if (unfound.length > 0) {
-                        const randomTarget = unfound[Math.floor(Math.random() * unfound.length)];
-                        floatText.innerText = 'May mắn: ' + randomTarget.emoji;
-                        // Kích hoạt hàm click giùm người chơi
-                        handleFindTarget(randomTarget.id, randomTarget.wrapper, randomTarget.inner);
-                    } else {
-                        floatText.innerText = 'Trống rỗng!';
-                    }
+                if (currentLevelIndex < LEVELS.length - 1) {
+                    showScreen('levelWinScreen');
                 } else {
-                    // Dính Bẫy
-                    floatText.className = 'float-text-bad';
-                    const badType = TRAPS[Math.floor(Math.random() * TRAPS.length)];
-                    floatText.innerText = 'Xui xẻo: ' + badType;
-                    
-                    if (badType === '💣') { 
-                        playSound('trap_bomb');
-                        timeRemaining = Math.max(0, timeRemaining - 5);
-                        updateTimerDisplay();
-                        const timerEl = document.getElementById('timer');
-                        timerEl.classList.add('text-red-600', 'scale-125');
-                        setTimeout(() => timerEl.classList.remove('text-red-600', 'scale-125'), 500);
-                    } else if (badType === '🧊') { 
-                        playSound('trap_freeze');
-                        const freezeOverlay = document.getElementById('freeze-overlay');
-                        freezeOverlay.classList.remove('hidden');
-                        isDragging = false; 
-                        void freezeOverlay.offsetWidth;
-                        freezeOverlay.classList.add('active');
-                        setTimeout(() => {
-                            freezeOverlay.classList.remove('active');
-                            setTimeout(() => freezeOverlay.classList.add('hidden'), 300);
-                        }, 1500);
-                    } else if (badType === '🌪️') {
-                        playSound('trap_tornado');
-                        mapContainer.style.filter = 'blur(12px)';
-                        setTimeout(() => {
-                            mapContainer.style.filter = 'none';
-                        }, 2000);
-                    }
+                    document.getElementById('final-score-text').innerText = score;
+                    showScreen('winScreen');
                 }
             }
-
-            mapContainer.appendChild(floatText);
-            setTimeout(() => floatText.remove(), 1000);
-
-            inner.classList.add('found-anim');
-            setTimeout(() => wrapper.remove(), 400);
         }
 
         function updateTimerDisplay() {
@@ -803,103 +725,39 @@
             document.getElementById('timer').innerText = `${m}:${s}`;
         }
 
-        function levelComplete() {
-            isPlaying = false;
-            clearInterval(timerInterval);
-            playSound('win');
-            
-            if (currentLevelIndex < LEVELS.length - 1) {
-                // Thay đổi câu thoại troll ngẫu nhiên
-                document.getElementById('levelWinText').innerText = LEVEL_WIN_QUOTES[Math.floor(Math.random() * LEVEL_WIN_QUOTES.length)];
-                showScreen('levelWinScreen');
-            } else {
-                showScreen('winScreen');
-            }
-        }
-
         function gameOver() {
             isPlaying = false;
             clearInterval(timerInterval);
             playSound('lose');
-            
-            // Thay đổi câu thoại troll ngẫu nhiên
-            document.getElementById('loseText').innerText = LOSE_QUOTES[Math.floor(Math.random() * LOSE_QUOTES.length)];
             showScreen('loseScreen');
         }
 
-        // --- QUẢN LÝ MÀN HÌNH UI ---
         function hideAllScreens() {
-            const screens = ['levelWinScreen', 'loseScreen', 'winScreen'];
+            const screens = ['levelWinScreen', 'loseScreen', 'winScreen', 'startScreen'];
             screens.forEach(id => {
                 const el = document.getElementById(id);
-                el.classList.add('opacity-0', 'pointer-events-none');
-                setTimeout(() => el.classList.add('hidden'), 300); // Đợi CSS transition chạy xong
+                if (el) {
+                    el.classList.add('opacity-0', 'pointer-events-none');
+                    setTimeout(() => el.classList.add('hidden'), 300);
+                }
             });
         }
 
         function showScreen(id) {
-            hudTop.classList.add('hidden');
-            checklistUI.classList.add('hidden');
+            document.getElementById('hud-top').classList.add('hidden');
+            document.getElementById('target-hud').classList.add('hidden');
+            document.getElementById('board-container').classList.add('hidden');
             
             const screen = document.getElementById(id);
             screen.classList.remove('hidden', 'pointer-events-none');
-            // Trigger reflow
             void screen.offsetWidth;
             screen.classList.remove('opacity-0');
         }
 
-        // --- PANNING LOGIC ĐƯỢC GIỮ NGUYÊN ---
-        let isDragging = false;
-        let startX, startY;
-        let posX = 0, posY = 0;
-
-        function updateMapPosition() {
-            const minX = window.innerWidth - MAP_WIDTH;
-            const minY = window.innerHeight - MAP_HEIGHT;
-            
-            posX = Math.min(0, Math.max(minX, posX));
-            posY = Math.min(0, Math.max(minY, posY));
-
-            mapContainer.style.transform = `translate(${posX}px, ${posY}px)`;
-        }
-
-        // Mouse Events
-        viewport.addEventListener('mousedown', (e) => {
-            isDragging = true;
-            startX = e.clientX - posX;
-            startY = e.clientY - posY;
-        });
-        window.addEventListener('mousemove', (e) => {
-            if (!isDragging) return;
-            posX = e.clientX - startX;
-            posY = e.clientY - startY;
-            updateMapPosition();
-        });
-        window.addEventListener('mouseup', () => { isDragging = false; });
-        window.addEventListener('mouseleave', () => { isDragging = false; });
-
-        // Touch Events
-        viewport.addEventListener('touchstart', (e) => {
-            if (e.touches.length === 1) {
-                isDragging = true;
-                startX = e.touches[0].clientX - posX;
-                startY = e.touches[0].clientY - posY;
-            }
-        }, { passive: false });
-        window.addEventListener('touchmove', (e) => {
-            if (!isDragging || e.touches.length !== 1) return;
-            e.preventDefault(); // Chống cuộn trang
-            posX = e.touches[0].clientX - startX;
-            posY = e.touches[0].clientY - startY;
-            updateMapPosition();
-        }, { passive: false });
-        window.addEventListener('touchend', () => { isDragging = false; });
-
-        window.addEventListener('resize', updateMapPosition);
-
-        // --- BUTTON BINDINGS ---
+        // --- GẮN NÚT GIAO DIỆN ---
         document.getElementById('btnStart').addEventListener('click', startGame);
         document.getElementById('btnRestart').addEventListener('click', () => {
+            score = 0; // Reset điểm
             hideAllScreens();
             setTimeout(startGame, 300);
         });
